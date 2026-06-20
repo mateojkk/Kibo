@@ -295,7 +295,6 @@ export function useTerminalController(options: UseTerminalOptions = {}) {
           setWallet,
           setBusy,
           push,
-          executeSend,
         });
         return;
       }
@@ -315,11 +314,34 @@ export function useTerminalController(options: UseTerminalOptions = {}) {
         setLines,
         bootLines: BOOT_LINES,
         push,
-        executeSend,
+        isPrivateMode,
       });
     },
     [wallet, executeSend, push, step]
   );
+
+  const confirmSendTransaction = useCallback(async () => {
+    if (step?.flow !== 'confirm-send') return;
+    const { amount, recipientAddress, tokenSymbol } = step.pending;
+    
+    setBusy(true);
+    try {
+      setStep(null);
+      await executeSend(amount, recipientAddress, tokenSymbol);
+    } catch (e: any) {
+      const detail = e.response?.data?.detail;
+      push({ kind: 'error', text: `Failed: ${detail || e.message}` });
+      setStep(null);
+    } finally {
+      setBusy(false);
+    }
+  }, [step, executeSend, push]);
+
+  const cancelSendTransaction = useCallback(() => {
+    if (step?.flow !== 'confirm-send') return;
+    setStep(null);
+    push({ kind: 'error', text: 'transfer cancelled' });
+  }, [step, push]);
 
   return {
     lines,
@@ -332,5 +354,7 @@ export function useTerminalController(options: UseTerminalOptions = {}) {
     setIsPrivateMode,
     handleSubmit,
     setWallet,
+    confirmSendTransaction,
+    cancelSendTransaction,
   };
 }

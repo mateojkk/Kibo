@@ -134,8 +134,9 @@
 @media (min-width: 960px) {
   .app-shell {
     display: grid;
-    grid-template-columns: 240px minmax(0, 1fr);
+    grid-template-columns: 200px minmax(0, 1fr);
     grid-template-rows: var(--header-h) minmax(0, 1fr);
+    transition: grid-template-columns 0.2s ease;
     max-width: none;
     height: 100dvh;
     margin: 0;
@@ -144,6 +145,20 @@
     background: transparent;
     box-shadow: none;
     overflow: hidden;
+  }
+  
+  .app-shell.collapsed {
+    grid-template-columns: 72px minmax(0, 1fr);
+  }
+
+  .app-shell.collapsed .tab-label,
+  .app-shell.collapsed .logo-text {
+    display: none;
+  }
+
+  .app-shell.collapsed .tab-item {
+    padding: 10px;
+    justify-content: center;
   }
 
   .app-header {
@@ -193,4 +208,5 @@
     width: 18px;
     height: 18px;
   }
+
 }

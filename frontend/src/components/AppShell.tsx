@@ -43,6 +43,8 @@ export default function AppShell({
   });
   const shortAddr = `${wallet.address.slice(0, 6)}…${wallet.address.slice(-4)}`;
 
+  const [isCollapsed, setIsCollapsed] = useState(false);
+
   const handleRequestFaucet = () => {
     window.open('https://faucet.circle.com/', '_blank');
   };
@@ -52,11 +54,17 @@ export default function AppShell({
   }, [activeTab]);
 
   return (
-    <div className={styles['app-shell']}>
+    <div className={`${styles['app-shell']} ${isCollapsed ? styles.collapsed : ''}`}>
       {/* Header */}
       <header className={styles['app-header']}>
-        <div className={styles['app-logo']} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <img src="/logo.png" alt="kibo" className={styles['app-logo-img']} />
+        <div 
+          className={styles['app-logo']} 
+          style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}
+          onClick={() => setIsCollapsed(!isCollapsed)}
+          title={isCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
+        >
+          <img src="/logo.png" alt="Kibo Logo" className={styles['app-logo-img']} />
+          <span className={styles['logo-text']}>Kibo</span>
         </div>
         <div
           className={styles['app-user-badge']}
@@ -159,6 +167,7 @@ export default function AppShell({
             </svg>
           }
         />
+
       </nav>
     </div>
   );
@@ -169,32 +178,14 @@ function isTab(value: string | null): value is Tab {
   return value === 'home' || value === 'contacts' || value === 'chat' || value === 'settings' || value === 'transactions';
 }
 
-function TabItem({
-  id,
-  label,
-  icon,
-  active,
-  onClick,
-}: {
-  id: string;
-  label: string;
-  icon: React.ReactNode;
-  active: boolean;
-  onClick: () => void;
-}) {
+function TabItem({ label, active, onClick, icon }: any) {
   return (
     <button
-      id={`tab-${id}`}
-      className={
-        active
-          ? `${styles['tab-item']} ${styles.active}`
-          : styles['tab-item']
-      }
+      className={`${styles['tab-item']} ${active ? styles.active : ''}`}
       onClick={onClick}
-      aria-label={label}
     >
       {icon}
-      {label}
+      <span className={styles['tab-label']}>{label}</span>
     </button>
   );
 }

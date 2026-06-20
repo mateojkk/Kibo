@@ -13,12 +13,10 @@ type StepContext = {
   setWallet: (wallet: AgentWallet | null) => void;
   setBusy: (busy: boolean) => void;
   push: (...lines: OutputLine[]) => void;
-  executeSend: (amount: number, to: string, tokenSymbol?: string) => Promise<boolean>;
 };
 
-export function stepMasksInput(step: Step): boolean {
-  if (!step) return false;
-  return step.flow === 'pin-set' || step.flow === 'pin-verify' || (step as any).step === 'pin' || (step as any).step === 'confirm';
+export function stepMasksInput(_step?: Step | null): boolean {
+  return false;
 }
 
 export async function handleStepInput({
@@ -28,7 +26,6 @@ export async function handleStepInput({
   setWallet,
   setBusy,
   push,
-  executeSend,
 }: StepContext): Promise<boolean> {
   if (!step) return false;
 
@@ -102,69 +99,11 @@ export async function handleStepInput({
     }
   }
 
-  if (step.flow === 'pin-set') {
-    if (step.step === 'pin') {
-      if (!/^\d{4,12}$/.test(raw.trim())) {
-        push({ kind: 'error', text: 'pin must be 4–12 digits' });
-        return true;
-      }
-      setStep({ flow: 'pin-set', step: 'confirm', pin: raw.trim() });
-      push({ kind: 'info', text: 'confirm transaction pin:' });
-      return true;
-    }
-    if (step.step === 'confirm') {
-      if (raw.trim() !== step.pin) {
-        push({ kind: 'error', text: 'pin mismatch — try again' });
-        setStep({ flow: 'pin-set', step: 'pin' });
-        push({ kind: 'info', text: 'set a 4–12 digit transaction pin:' });
-        return true;
-      }
-      setStep(null);
-      setBusy(true);
-      try {
-        await baseApi.post('/auth/pin', { pin: raw.trim() });
-        push({ kind: 'success', text: '✓ transaction pin set' });
-      } catch (e: any) {
-        push({ kind: 'error', text: `failed to set pin: ${e.message || 'unauthorized'}` });
-      } finally {
-        setBusy(false);
-      }
-      return true;
-    }
-  }
 
-  if (step.flow === 'pin-verify' && step.step === 'pin') {
-    setBusy(true);
-    try {
-      const approval = await baseApi.post('/transfers/authorize', {
-        amount: step.pending.amount,
-        to: step.pending.recipientAddress,
-        pin: raw.trim(),
-      });
-      setStep(null);
-      const sent = await executeSend(step.pending.amount, step.pending.recipientAddress, step.pending.tokenSymbol);
-      if (sent && approval.data?.approvalId) {
-        await baseApi.post('/transfers/confirm', { approvalId: approval.data.approvalId });
-      }
-    } catch (e: any) {
-      const detail = e.response?.data?.detail;
-      if (detail === 'invalid pin') {
-        const attempts = step.attempts + 1;
-        if (attempts < 3) {
-          setStep({ ...step, attempts });
-          push({ kind: 'error', text: `invalid pin — ${3 - attempts} attempt${3 - attempts === 1 ? '' : 's'} left` });
-          push({ kind: 'info', text: 'enter transaction pin:' });
-        } else {
-          setStep(null);
-          push({ kind: 'error', text: 'invalid pin — 3 attempts used. send cancelled' });
-        }
-      } else {
-        setStep(null);
-        push({ kind: 'error', text: `pin failed: ${detail || e.message || 'unauthorized'}` });
-      }
-    } finally {
-      setBusy(false);
-    }
+
+  if (step.flow === 'confirm-send') {
+    setStep(null);
+    push({ kind: 'error', text: 'transfer cancelled' });
     return true;
   }
 

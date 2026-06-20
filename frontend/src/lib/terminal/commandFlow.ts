@@ -2,7 +2,7 @@ import type { OutputLine } from '../../components/TerminalOutput';
 import type { AgentWallet } from '../wallet';
 import { getPersistedUsername, suiClient, executeSponsoredTransaction, loginWithGoogle, generateMockGoogleJwt } from '../wallet';
 import { getContacts, addContact, removeContact, findContact } from '../contacts';
-import { baseApi } from '../../api';
+
 import { SUI_STABLECOINS, SUI_COIN, KIBO_PACKAGE_ID, SHIELDED_POOL_ID, EXPLORER_TX } from '../suiChain';
 import type { Command } from '../commandParser';
 import type { Step } from './types';
@@ -18,11 +18,11 @@ type CommandContext = {
   setLines: (lines: OutputLine[]) => void;
   bootLines: OutputLine[];
   push: (...lines: OutputLine[]) => void;
-  executeSend: (amount: number, to: string, tokenSymbol?: string) => Promise<boolean>;
+  isPrivateMode: boolean;
 };
 
 export async function handleCommand(
-  { cmd, wallet, setWallet, setStep, setContacts, setBusy, setLines, bootLines, push, executeSend }: CommandContext
+  { cmd, wallet, setWallet, setStep, setContacts, setBusy, setLines, bootLines, push, isPrivateMode }: CommandContext
 ): Promise<boolean> {
   if (cmd.type === 'clear') {
     setLines(bootLines);
@@ -115,12 +115,7 @@ export async function handleCommand(
     return true;
   }
 
-  if (cmd.type === 'pin-set') {
-    if (!wallet) { push({ kind: 'error', text: 'no wallet — type `login` or `create`' }); return true; }
-    push({ kind: 'info', text: 'set a 4–12 digit transaction pin:' });
-    setStep({ flow: 'pin-set', step: 'pin' });
-    return true;
-  }
+
 
   if (cmd.type === 'contacts') {
     try {
@@ -244,17 +239,15 @@ export async function handleCommand(
         return true;
       }
       
-      const status = await baseApi.get('/auth/pin/status');
-      if (!status.data?.enabled) {
-        await executeSend(cmd.amount, recipientAddress, token.symbol);
-        return true;
-      }
-      push({ kind: 'info', text: 'enter transaction pin:' });
       setStep({
-        flow: 'pin-verify',
-        step: 'pin',
-        attempts: 0,
-        pending: { amount: cmd.amount, to: cmd.to, recipientAddress, tokenSymbol: token.symbol },
+        flow: 'confirm-send',
+        pending: { 
+          amount: cmd.amount, 
+          to: cmd.to, 
+          recipientAddress, 
+          tokenSymbol: token.symbol,
+          isPrivate: isPrivateMode
+        },
       });
     } catch (e: any) {
       push({ kind: 'error', text: `failed to verify pin status: ${e.message || 'unauthorized'}` });
