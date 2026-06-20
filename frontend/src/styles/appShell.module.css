@@ -182,7 +182,7 @@
     grid-column: 1;
     grid-row: 2;
     flex-direction: column;
-    height: auto;
+    height: 100%;
     border-top: none;
     border-right: none;
     padding: 18px 12px;

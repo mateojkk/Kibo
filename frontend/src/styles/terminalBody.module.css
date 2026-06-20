@@ -9,9 +9,9 @@
   scroll-behavior: smooth;
   scrollbar-width: thin;
   scrollbar-color: var(--border-hl) transparent;
-  max-width: 600px;
+  max-width: none;
   width: 100%;
-  margin: 0 auto;
+  margin: 0;
 }
 
 .terminal-body::-webkit-scrollbar {
