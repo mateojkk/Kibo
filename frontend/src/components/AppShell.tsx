@@ -43,7 +43,7 @@ export default function AppShell({
   });
   const shortAddr = `${wallet.address.slice(0, 6)}…${wallet.address.slice(-4)}`;
 
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(true);
 
   const handleRequestFaucet = () => {
     window.open('https://faucet.circle.com/', '_blank');
