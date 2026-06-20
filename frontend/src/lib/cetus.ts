@@ -1,6 +1,5 @@
 import { CetusClmmSDK, clmmTestnet } from '@cetusprotocol/cetus-sui-clmm-sdk';
-import { Transaction } from '@mysten/sui/transactions';
-import { AgentWallet, suiClient } from './wallet';
+import type { AgentWallet } from './wallet';
 
 export const cetusSDK = new CetusClmmSDK(clmmTestnet);
 

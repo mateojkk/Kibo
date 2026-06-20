@@ -41,7 +41,7 @@ export async function generateEncryptionKeypair(email: string, salt: string): Pr
   );
 
   // Derive 32 bytes of seed
-  const entropy = await window.crypto.subtle.deriveBits(
+  await window.crypto.subtle.deriveBits(
     {
       name: 'PBKDF2',
       salt: encoder.encode('kibo-encryption-salt-seed'),

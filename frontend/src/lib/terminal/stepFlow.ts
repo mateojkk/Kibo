@@ -18,7 +18,7 @@ type StepContext = {
 
 export function stepMasksInput(step: Step): boolean {
   if (!step) return false;
-  return step.flow === 'pin-set' || step.flow === 'pin-verify' || step.step === 'pin' || step.step === 'confirm';
+  return step.flow === 'pin-set' || step.flow === 'pin-verify' || (step as any).step === 'pin' || (step as any).step === 'confirm';
 }
 
 export async function handleStepInput({
@@ -57,18 +57,11 @@ export async function handleStepInput({
         push({ kind: 'error', text: 'username can only contain letters, numbers, and underscores' });
         return true;
       }
-      setStep({ flow: 'connect-new', step: 'inviteCode', email: step.email, username });
-      push({ kind: 'info', text: 'enter invite code (KIBO-XXXX):' });
-      return true;
-    }
-
-    if (step.step === 'inviteCode') {
-      const code = raw.trim().toUpperCase();
       setStep(null);
       setBusy(true);
       push({ kind: 'info', text: 'fetching salt and generating keypairs...' });
       try {
-        const wallet = await loginWithGoogle(generateMockGoogleJwt(step.email), step.username, code);
+        const wallet = await loginWithGoogle(generateMockGoogleJwt(step.email), username);
         setWallet(wallet);
         push(
           { kind: 'success', text: `✓ wallet created for @${wallet.username}` },
@@ -202,7 +195,7 @@ export async function handleStepInput({
       if (!address) throw new Error('Failed to resolve active wallet address');
 
       const destAddrHex = address.replace('0x', '');
-      const destBytes = new Uint8Array(destAddrHex.match(/.{1,2}/g)!.map(byte => parseInt(byte, 16)));
+      const destBytes = new Uint8Array(destAddrHex.match(/.{1,2}/g)!.map((byte: string) => parseInt(byte, 16)));
 
       // 3. Message to sign = commitment bytes + destination address bytes
       const msg = new Uint8Array(commitmentBytes.length + destBytes.length);
@@ -237,7 +230,7 @@ export async function handleStepInput({
           tx.object(SHIELDED_POOL_ID),
           tx.pure.vector('u8', Array.from(commitmentBytes)),
           tx.pure.vector('u8', Array.from(pubKeyBytes)),
-          tx.pure.vector('u8', Array.from(userSig.signature)),
+          tx.pure.vector('u8', Array.from(atob(userSig.signature), c => c.charCodeAt(0))),
           tx.pure.address(address),
           tx.pure.u64(amountRaw),
         ],

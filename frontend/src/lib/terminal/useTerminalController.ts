@@ -81,7 +81,7 @@ export function useTerminalController(options: UseTerminalOptions = {}) {
 
   const resolveRecipient = async (to: string) => {
     const cleaned = to.trim().replace(/^@/, '');
-    let fresh = [];
+    let fresh: any[] = [];
     try {
       fresh = await getContacts();
       setContacts(fresh);

@@ -284,7 +284,7 @@ export async function handleCommand(
 
       // 2. Destination address bytes (Bob's address)
       const destAddrHex = wallet.address.replace('0x', '');
-      const destBytes = new Uint8Array(destAddrHex.match(/.{1,2}/g)!.map(byte => parseInt(byte, 16)));
+      const destBytes = new Uint8Array(destAddrHex.match(/.{1,2}/g)!.map((byte: string) => parseInt(byte, 16)));
 
       // 3. Message to sign = commitment bytes + destination address bytes
       const msg = new Uint8Array(commitmentBytes.length + destBytes.length);
@@ -307,7 +307,7 @@ export async function handleCommand(
           tx.object(SHIELDED_POOL_ID),
           tx.pure.vector('u8', Array.from(commitmentBytes)),
           tx.pure.vector('u8', Array.from(pubKeyBytes)),
-          tx.pure.vector('u8', Array.from(userSig.signature)),
+          tx.pure.vector('u8', Array.from(atob(userSig.signature), c => c.charCodeAt(0))),
           tx.pure.address(wallet.address),
           tx.pure.u64(amountRaw),
         ],
