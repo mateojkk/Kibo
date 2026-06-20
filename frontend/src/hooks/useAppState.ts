@@ -75,12 +75,10 @@ export function useAppState() {
       );
       setAssets(results);
       
-      // Calculate a total (sum of stablecoins + SUI * mock $1.25)
+      // Calculate a total (sum of stablecoins, excluding SUI since users can't send/receive it)
       const total = results.reduce((acc, item) => {
+        if (item.symbol === 'SUI') return acc;
         const val = parseFloat(item.balance);
-        if (item.symbol === 'SUI') {
-          return acc + (val * 1.25); // simple mock price
-        }
         return acc + val;
       }, 0);
       setBalance(total.toFixed(2));

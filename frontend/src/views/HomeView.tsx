@@ -1,27 +1,28 @@
 import { useEffect, useState } from 'react';
 import type { AgentWallet, AssetBalance } from '../hooks/useAppState';
-import { baseApi } from '../api';
-import { performSwap } from '../lib/cetus';
-import toast from 'react-hot-toast';
+
 import homeStyles from '../styles/home.module.css';
 
 function TokenIcon({ symbol }: { symbol: string }) {
-  // Return a beautiful, HSL-colored fallback icon for each token
-  const colors: Record<string, string> = {
-    SUI: 'linear-gradient(135deg, #0284c7, #38bdf8)',
-    USDC: 'linear-gradient(135deg, #2563eb, #3b82f6)',
-    FDUSD: 'linear-gradient(135deg, #059669, #34d399)',
-    AUSD: 'linear-gradient(135deg, #dc2626, #f87171)',
-    USDY: 'linear-gradient(135deg, #d97706, #fbbf24)',
-    USDsui: 'linear-gradient(135deg, #7c3aed, #a78bfa)',
-  };
+  if (symbol === 'USDC') {
+    return <img src="https://cryptologos.cc/logos/usd-coin-usdc-logo.png" alt="USDC" className={homeStyles['asset-icon-fallback']} style={{ background: 'transparent', padding: '0', border: 'none' }} />;
+  }
+  
+  if (symbol === 'USDsui') {
+    return (
+      <div className={homeStyles['asset-icon-fallback']} style={{ background: '#0b0a0a', border: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4c8cf5" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+        </svg>
+      </div>
+    );
+  }
 
-  const background = colors[symbol] || 'linear-gradient(135deg, #4b5563, #9ca3af)';
-
+  // Fallback for any other unexpected tokens
   return (
     <div 
       className={homeStyles['asset-icon-fallback']}
-      style={{ background, color: '#fff', fontWeight: 'bold', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+      style={{ background: 'linear-gradient(135deg, #4b5563, #9ca3af)', color: '#fff', fontWeight: 'bold', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
     >
       {symbol.charAt(0)}
     </div>
@@ -38,7 +39,6 @@ interface HomeViewProps {
 }
 
 export default function HomeView({
-  wallet,
   balance,
   balanceLoading,
   assets,
@@ -46,8 +46,6 @@ export default function HomeView({
   onNavigateToTab,
 }: HomeViewProps) {
   const BALANCE_VISIBILITY_KEY = 'kibo_balance_visible';
-  const [faucetLoading, setFaucetLoading] = useState(false);
-  const [swapLoading, setSwapLoading] = useState(false);
   const [balanceVisible, setBalanceVisible] = useState<boolean>(() => {
     const saved = sessionStorage.getItem(BALANCE_VISIBILITY_KEY);
     return saved !== '0';
@@ -55,45 +53,6 @@ export default function HomeView({
 
   const handleRefresh = () => {
     onRefresh();
-  };
-
-  const handleRequestFaucet = async () => {
-    if (faucetLoading) return;
-    setFaucetLoading(true);
-    const loadingToast = toast.loading('Requesting SUI from Testnet Faucet...');
-    
-    try {
-      const resp = await baseApi.post('/faucet');
-      if (resp.data?.ok) {
-        toast.success('SUI successfully requested! Balances will update shortly.', { id: loadingToast });
-        setTimeout(() => {
-          handleRefresh();
-        }, 3000);
-      } else {
-        toast.error(`Faucet request throttled or failed. Please try again later.`, { id: loadingToast });
-      }
-    } catch (e: any) {
-      console.error(e);
-      toast.error(e.response?.data?.detail || 'Faucet request failed.', { id: loadingToast });
-    } finally {
-      setFaucetLoading(false);
-    }
-  };
-
-  const handleSwap = async () => {
-    if (swapLoading) return;
-    setSwapLoading(true);
-    const loadingToast = toast.loading('Swapping 1 SUI for USDC...');
-    try {
-      await performSwap(wallet, 1);
-      toast.success('Swap complete! Balances updated.', { id: loadingToast });
-      onRefresh();
-    } catch (e: any) {
-      console.error(e);
-      toast.error(e.message || 'Swap failed.', { id: loadingToast, duration: 6000 });
-    } finally {
-      setSwapLoading(false);
-    }
   };
 
   useEffect(() => {
@@ -166,29 +125,13 @@ export default function HomeView({
           </svg>
           Chat Command Line
         </button>
-        <button
-          className={`${homeStyles['action-btn']} ${homeStyles.primary}`}
-          onClick={handleRequestFaucet}
-          disabled={faucetLoading || swapLoading}
-        >
-          <svg viewBox="0 0 24 24"><path d="M12 2v14m-7-7 7 7 7-7"/><path d="M5 21h14"/></svg>
-          {faucetLoading ? 'Requesting...' : 'Request Faucet Tokens'}
-        </button>
-        <button
-          className={`${homeStyles['action-btn']}`}
-          onClick={handleSwap}
-          disabled={swapLoading || faucetLoading}
-        >
-          <svg viewBox="0 0 24 24"><path d="M4 12h16M4 12l4-4m-4 4 4 4"/></svg>
-          {swapLoading ? 'Swapping...' : 'Swap 1 SUI for USDC'}
-        </button>
       </div>
 
       {/* Assets list */}
       <div className={homeStyles['asset-section']}>
         <div className={homeStyles['asset-title']}>Asset Accounts (Sui Testnet)</div>
         <div className={homeStyles['asset-list']}>
-          {assets.map((asset) => {
+          {assets.filter(a => ['USDC', 'USDsui'].includes(a.symbol)).map((asset) => {
             return (
               <div key={asset.address} className={homeStyles['asset-card']}>
                 <div className={homeStyles['asset-info']}>
