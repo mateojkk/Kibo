@@ -109,7 +109,7 @@ export default function AuthView({ onWallet }: AuthViewProps) {
     <div className={authStyles['auth-view']}>
       <div className={authStyles['auth-left']}>
         <div className={authStyles['auth-left-content']}>
-          <h1>Kibo</h1>
+          <h1>Kibo <span style={{ fontSize: '16px', fontWeight: 600, background: 'rgba(255,255,255,0.2)', padding: '4px 10px', borderRadius: '8px', verticalAlign: 'middle', color: '#fff', marginLeft: '8px' }}>TESTNET</span></h1>
           <p>Private conversational payments on Sui.</p>
         </div>
       </div>

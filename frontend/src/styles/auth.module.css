@@ -507,7 +507,7 @@ button.auth-divider:hover {
   }
 
   .auth-left {
-    width: 65%;
+    width: 50%;
     height: 100vh;
     background: url('/login-image.jpg') center/cover no-repeat;
     display: flex;
@@ -517,7 +517,7 @@ button.auth-divider:hover {
   }
 
   .auth-right {
-    width: 35%;
+    width: 50%;
     height: 100vh;
     display: flex;
     align-items: center;
