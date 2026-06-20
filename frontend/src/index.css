@@ -57,7 +57,11 @@ html, body {
   font-family: var(--font-ui);
   font-weight: 300;
   -webkit-font-smoothing: antialiased;
-  color: var(--fg);
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body * {
+  font-weight: 300 !important;
 }
 
 h1, h2, h3 {
