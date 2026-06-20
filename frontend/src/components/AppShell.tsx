@@ -85,7 +85,7 @@ export default function AppShell({
       </header>
 
       {/* Content */}
-      <main className={styles['app-content']}>
+      <main className={`${styles['app-content']} ${activeTab === 'chat' ? styles['no-padding'] : ''}`}>
         {activeTab === 'home' && (
           <HomeView
             wallet={wallet}
