@@ -1,0 +1,11 @@
+{
+  "name": "kibo-root",
+  "private": true,
+  "scripts": {
+    "dev:frontend": "cd frontend && npm run dev",
+    "dev:backend": "./.venv/bin/python api/index.py",
+    "dev": "npm run dev:backend & PID=$!; until curl -s http://localhost:8080/health > /dev/null 2>&1; do sleep 0.5; done; npm run dev:frontend; wait $PID",
+    "build": "cd frontend && npm install && npm run build",
+    "install:all": "npm install && cd frontend && npm install && cd .. && python3 -m venv .venv && .venv/bin/pip install -r api/requirements.txt"
+  }
+}

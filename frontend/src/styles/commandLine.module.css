@@ -1,0 +1,118 @@
+/* =============================
+   COMMAND LINE INPUT
+   ============================= */
+.command-line {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  width: 100%;
+  padding: 0 1rem;
+  gap: 0.5rem;
+  cursor: text;
+  position: relative;
+}
+
+.composer {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  background: var(--overlay);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 0.45rem 0.5rem 0.45rem 0.85rem;
+}
+
+.command-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--fg);
+  font-family: var(--font);
+  font-size: 13.5px;
+  caret-color: var(--accent);
+  min-width: 0;
+  line-height: 1.4;
+}
+
+.command-input::placeholder {
+  color: var(--fg-muted);
+  font-style: italic;
+}
+
+.command-input:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.command-send-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--accent);
+  border: none;
+  color: #08110d;
+  font-family: var(--font-ui);
+  font-weight: 600;
+  font-size: 12px;
+  padding: 0 0.95rem;
+  height: 34px;
+  align-self: center;
+  border-radius: 999px;
+}
+
+.command-send-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.command-suggestions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  width: 100%;
+}
+
+.command-suggestion {
+  border: 1px solid var(--border);
+  background: var(--overlay);
+  color: var(--fg-dim);
+  border-radius: 999px;
+  padding: 0.3rem 0.6rem;
+  font-size: 11px;
+  line-height: 1.2;
+}
+
+@media (max-width: 600px) {
+  .command-line {
+    padding: 0 0.6rem;
+  }
+  .command-input {
+    font-size: 14px;
+  }
+  input,
+  textarea,
+  select {
+    font-size: 14px;
+  }
+  .command-line,
+  .command-input {
+    touch-action: manipulation;
+  }
+  .command-send-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 420px) {
+  .composer {
+    padding-left: 0.7rem;
+  }
+
+  .command-send-button {
+    padding: 0 0.8rem;
+  }
+}

@@ -1,0 +1,305 @@
+.home-container {
+  padding-bottom: 20px;
+}
+
+.balance-card {
+  margin: 24px 20px 0;
+  padding: 30px 26px;
+  border-radius: var(--radius-lg);
+  background: var(--bg-card);
+  border: none;
+  position: relative;
+  overflow: hidden;
+}
+
+.balance-label {
+  font-size: 12px;
+  letter-spacing: 0.02em;
+  text-transform: none;
+  color: var(--fg-muted);
+  margin-bottom: 12px;
+  font-weight: 500;
+}
+
+.balance-amount {
+  font-size: 44px;
+  font-weight: 700;
+  color: var(--fg);
+  letter-spacing: -0.03em;
+  line-height: 1;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.balance-currency {
+  font-size: 16px;
+  font-weight: 400;
+  color: var(--fg-dim);
+}
+
+.balance-actions {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.balance-refresh {
+  background: none;
+  border: none;
+  color: var(--fg-muted);
+  cursor: pointer;
+  padding: 6px;
+  border-radius: var(--radius-sm);
+  transition: color 0.15s, background 0.15s;
+  display: flex;
+  align-items: center;
+  font-size: 12px;
+}
+.balance-refresh:hover { color: var(--fg); background: var(--bg-hover); }
+.spinning { animation: spin 1s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ─────────────────────────────────────────────
+   ACTION ROW (quick actions)
+   ───────────────────────────────────────────── */
+.action-row {
+  display: grid;
+  gap: 12px;
+  padding: 18px 20px 0;
+  grid-template-columns: 1fr 1fr;
+}
+
+.action-btn {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 16px 12px;
+  background: var(--bg-card);
+  border: none;
+  border-radius: var(--radius);
+  cursor: pointer;
+  color: var(--fg);
+  font-family: var(--font-ui);
+  font-size: 13px;
+  font-weight: 600;
+  transition: background 0.15s, border-color 0.15s;
+}
+.action-btn:hover { background: var(--bg-hover); border-color: var(--border-hl); }
+.action-btn.primary { border-color: var(--accent); color: var(--accent); }
+.action-btn.primary:hover { background: var(--bg-hover); }
+
+
+.action-btn svg {
+  width: 20px; height: 20px;
+  stroke: currentColor; fill: none;
+  stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
+}
+
+.action-btn.primary {
+  flex-direction: row;
+  justify-content: space-between;
+  padding: 16px 18px;
+  text-align: left;
+}
+
+.action-btn.primary svg {
+  width: 18px;
+  height: 18px;
+}
+
+@media (min-width: 720px) {
+  .action-row {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* ─────────────────────────────────────────────
+   ACTIVITY SECTION
+   ───────────────────────────────────────────── */
+.activity-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  text-decoration: none;
+  color: var(--blue);
+  font-size: 13px;
+  transition: color 0.15s;
+}
+.activity-link:hover { color: var(--fg); }
+
+.activity-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.activity-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 14px;
+  background: var(--bg-card);
+  border-radius: var(--radius);
+}
+
+.activity-amount {
+  font-weight: 600;
+  color: var(--fg);
+}
+
+.activity-meta {
+  font-size: 13px;
+  color: var(--fg-muted);
+  margin-top: 4px;
+}
+
+.activity-empty {
+  padding: 12px 14px;
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  color: var(--fg-muted);
+  font-size: 13px;
+}
+
+.activity-item .activity-link {
+  color: var(--blue);
+  font-size: 13px;
+}
+
+/* ─────────────────────────────────────────────
+   FAB (floating action button)
+   ───────────────────────────────────────────── */
+.fab {
+  position: fixed;
+  bottom: calc(var(--tab-h) + 20px);
+  right: calc(50% - 240px + 20px);
+  width: 48px; height: 48px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px;
+  font-weight: 300;
+  box-shadow: 0 4px 20px rgba(77,162,255,0.25);
+}
+.fab:hover { transform: scale(1.07); box-shadow: 0 6px 28px rgba(77,162,255,0.4); }
+.fab:active { transform: scale(0.96); }
+
+@media (max-width: 480px) {
+  .fab { right: 20px; }
+}
+
+@media (min-width: 960px) {
+  .fab {
+    right: calc(50% - 640px + 32px);
+    bottom: 32px;
+  }
+}
+
+/* ─────────────────────────────────────────────
+   ASSETS SECTION
+   ───────────────────────────────────────────── */
+.asset-section {
+  padding: 16px 20px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.asset-title {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--fg-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 2px;
+}
+
+.asset-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.asset-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+
+.asset-card:hover {
+  background: var(--bg-hover);
+}
+
+.asset-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.asset-icon-img {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: contain;
+}
+
+.asset-icon-fallback {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--overlay) 0%, rgba(77,162,255,0.04) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--accent);
+  border: 1px solid var(--border-hl);
+}
+
+.asset-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.asset-symbol {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--fg);
+}
+
+.asset-name {
+  font-size: 11px;
+  color: var(--fg-muted);
+}
+
+.asset-balance-container {
+  text-align: right;
+}
+
+.asset-balance {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--fg);
+}
+
+.asset-value {
+  font-size: 11px;
+  color: var(--fg-muted);
+  margin-top: 1px;
+}

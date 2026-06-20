@@ -1,0 +1,205 @@
+.contacts-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 10px;
+}
+
+.contacts-subtitle {
+  margin-top: 6px;
+  color: var(--fg-muted);
+  font-size: 13px;
+}
+
+.contacts-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-top: 2px;
+}
+
+.contacts-search {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  min-width: 0;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 10px 12px;
+  color: var(--fg-muted);
+}
+
+.contacts-search input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: var(--fg);
+  font-size: 13px;
+  font-family: var(--font-ui);
+}
+
+.contacts-search input::placeholder {
+  color: var(--fg-muted);
+}
+
+.contacts-count {
+  color: var(--fg-muted);
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.add-card-title {
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.add-card-copy {
+  color: var(--fg-muted);
+  font-size: 13px;
+  margin-bottom: 18px;
+}
+
+.add-field {
+  width: 100%;
+  max-width: none;
+}
+
+.add-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+/* ─────────────────────────────────────────────
+   CONTACT LIST
+   ───────────────────────────────────────────── */
+.contact-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px 20px;
+}
+
+.contact-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  transition: border-color 0.15s, background 0.15s;
+}
+.contact-item:hover {
+  border-color: var(--border-hl);
+  background: #2b2b2b;
+}
+
+.contact-avatar {
+  width: 36px; height: 36px;
+  border-radius: 12px;
+  background: rgba(77,162,255,0.12);
+  border: 1px solid rgba(77,162,255,0.18);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--accent);
+  flex-shrink: 0;
+}
+
+.contact-info { flex: 1; min-width: 0; }
+.contact-name { font-size: 14px; font-weight: 500; text-transform: capitalize; }
+.contact-addr { font-size: 12px; color: var(--fg-muted); font-family: var(--font-mono); margin-top: 4px; }
+
+.contact-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.contact-copy {
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--fg-dim);
+  border-radius: 8px;
+  padding: 7px 10px;
+  font-size: 12px;
+  font-family: var(--font-ui);
+  cursor: pointer;
+}
+
+.contact-copy:hover {
+  border-color: var(--border-hl);
+  color: var(--fg);
+}
+
+.contact-delete {
+  background: none;
+  border: 1px solid transparent;
+  color: var(--fg-muted);
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 8px;
+  transition: color 0.15s, background 0.15s, border-color 0.15s;
+  display: flex; align-items: center;
+}
+.contact-delete:hover {
+  color: var(--red);
+  background: rgba(255,82,82,0.08);
+  border-color: rgba(255,82,82,0.12);
+}
+
+/* ─────────────────────────────────────────────
+   EMPTY STATES
+   ───────────────────────────────────────────── */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 24px;
+  color: var(--fg-muted);
+  gap: 12px;
+  text-align: center;
+}
+.empty-state svg { opacity: 0.3; }
+.empty-state p { font-size: 13px; }
+
+@media (max-width: 600px) {
+  .contacts-header,
+  .contacts-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .contacts-count {
+    white-space: normal;
+  }
+
+  .contact-list {
+    padding: 14px 16px 16px;
+  }
+
+  .contact-item {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .contact-actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+
+  .add-actions {
+    justify-content: stretch;
+    flex-direction: column-reverse;
+  }
+}

@@ -1,0 +1,32 @@
+/* =============================
+   TERMINAL BODY (scrollable)
+   ============================= */
+.terminal-body {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 0.75rem 0;
+  scroll-behavior: smooth;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-hl) transparent;
+  max-width: 600px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.terminal-body::-webkit-scrollbar {
+  width: 4px;
+}
+.terminal-body::-webkit-scrollbar-track {
+  background: transparent;
+}
+.terminal-body::-webkit-scrollbar-thumb {
+  background: var(--border-hl);
+  border-radius: 2px;
+}
+
+@media (max-width: 600px) {
+  .terminal-body {
+    padding: 0.5rem 0;
+  }
+}

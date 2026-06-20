@@ -1,0 +1,12 @@
+/* ─────────────────────────────────────────────
+   UTIL
+   ───────────────────────────────────────────── */
+.text-green   { color: var(--accent); }
+.text-red     { color: var(--red); }
+.text-muted   { color: var(--fg-muted); }
+.text-mono    { font-family: var(--font-mono); }
+.mt-4         { margin-top: 16px; }
+
+.font-light   { font-weight: var(--font-light); }
+.font-mid    { font-weight: var(--font-mid); }
+.font-bold   { font-weight: var(--font-bold); }

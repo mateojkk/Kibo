@@ -1,0 +1,26 @@
+/* =============================
+   TERMINAL ROOT
+   ============================= */
+.terminal-root {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  background: var(--bg-term);
+  border: none;
+  cursor: text;
+  position: relative;
+}
+
+@media (max-width: 600px) {
+  :root {
+    font-size: 11px;
+    --header-h: 40px;
+    --footer-h: 48px;
+  }
+  .terminal-root {
+    border: none;
+  }
+}

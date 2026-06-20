@@ -1,0 +1,89 @@
+/* ─────────────────────────────────────────────
+   CONTACTS LEGACY VIEW
+   ───────────────────────────────────────────── */
+.animate-fade-in {
+  animation: fadeIn 0.25s ease both;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.glass-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: none;
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.input-group label {
+  font-size: 11px;
+  letter-spacing: 0.02em;
+  color: var(--fg-muted);
+  font-weight: 600;
+}
+
+.input-group input {
+  width: 100%;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 10px 12px;
+  color: var(--fg);
+  font-family: var(--font-ui);
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.input-group input:focus {
+  border-color: var(--accent);
+}
+
+.contact-item {
+  background: transparent;
+}
+
+.contact-item:hover {
+  background: var(--bg-hover);
+}
+
+.primary-button,
+.secondary-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-ui);
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s, transform 0.1s, border-color 0.15s, background 0.15s;
+}
+
+.primary-button {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  padding: 10px 16px;
+}
+
+.primary-button:hover { opacity: 0.9; }
+
+.secondary-button {
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  color: var(--fg);
+  padding: 8px 14px;
+  font-size: 0.85rem;
+}
+
+.secondary-button:hover {
+  border-color: var(--border-hl);
+}

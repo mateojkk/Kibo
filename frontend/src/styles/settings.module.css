@@ -1,0 +1,48 @@
+/* ─────────────────────────────────────────────
+   SETTINGS ROWS
+   ───────────────────────────────────────────── */
+.settings-group {
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.settings-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+  font-size: 14px;
+  color: var(--fg);
+}
+.settings-item:hover {
+  border-color: var(--border-hl);
+  background: var(--bg-hover);
+}
+.settings-item:first-child { border-radius: var(--radius) var(--radius) var(--radius-sm) var(--radius-sm); }
+.settings-item:last-child { border-radius: var(--radius-sm) var(--radius-sm) var(--radius) var(--radius); }
+.settings-item:only-child { border-radius: var(--radius); }
+
+.settings-item-label { display: flex; align-items: center; gap: 10px; }
+.settings-item-value { font-size: 12px; color: var(--fg-muted); font-family: var(--font-mono); }
+
+.settings-chevron { color: var(--fg-muted); }
+
+.settings-pfp-preview {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid var(--border-hl);
+}
+
+.settings-pfp-fallback {
+  font-size: 12px;
+  color: var(--fg-muted);
+}

@@ -1,0 +1,11 @@
+fastapi
+uvicorn[standard]
+python-dotenv
+supabase
+certifi
+passlib[bcrypt]
+PyJWT
+email-validator
+pytest
+requests
+google-auth

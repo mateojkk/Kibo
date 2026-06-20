@@ -1,0 +1,10 @@
+fastapi
+uvicorn[standard]
+python-dotenv
+pymongo[srv]
+passlib[bcrypt]
+PyJWT
+pytest
+mongomock
+email-validator
+requests

@@ -1,0 +1,165 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  padding: 0 0.85rem;
+  max-width: 600px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.quickActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.quickAction {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  border: 1px solid rgba(77,162,255,0.14);
+  background: #2a2a2a;
+  color: var(--fg-dim);
+  border-radius: 16px;
+  padding: 0.34rem 0.62rem;
+  font-size: 11px;
+  font-family: var(--font-ui);
+}
+
+.quickAction:hover {
+  color: var(--fg);
+  background: #313131;
+}
+
+.quickAction:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.composer {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.55rem;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 0.48rem 0.52rem 0.48rem 0.68rem;
+  box-shadow: none;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.composerPrivate {
+  border-color: rgba(217, 70, 239, 0.4);
+  box-shadow: 0 0 10px rgba(217, 70, 239, 0.15);
+}
+
+.toggleButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--fg-muted);
+  flex-shrink: 0;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.privateActive {
+  color: #d946ef;
+  background: rgba(217, 70, 239, 0.1);
+  box-shadow: 0 0 8px rgba(217, 70, 239, 0.2);
+}
+
+.privateActive:hover {
+  background: rgba(217, 70, 239, 0.2);
+}
+
+.privateInactive {
+  color: var(--fg-muted);
+  background: transparent;
+}
+
+.privateInactive:hover {
+  color: var(--fg);
+  background: var(--overlay);
+}
+
+.inputWrap {
+  flex: 1;
+  min-width: 0;
+}
+
+.textarea,
+.passwordInput {
+  width: 100%;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--fg);
+  font-family: var(--font-ui);
+  font-size: 14px;
+  line-height: 1.4;
+  resize: none;
+}
+
+.textarea {
+  min-height: 24px;
+  max-height: 140px;
+}
+
+.textarea::placeholder,
+.passwordInput::placeholder {
+  color: var(--fg-muted);
+}
+
+.sendButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 10px;
+  background: var(--accent);
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.sendButton:disabled {
+  background: var(--bg-hover);
+  color: var(--fg-muted);
+  cursor: not-allowed;
+}
+
+.suggestions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.suggestion {
+  border: 1px solid rgba(77,162,255,0.12);
+  background: #272727;
+  color: var(--fg-muted);
+  border-radius: 14px;
+  padding: 0.26rem 0.58rem;
+  font-size: 11px;
+  line-height: 1.2;
+}
+
+.suggestion:hover {
+  color: var(--fg);
+  background: #303030;
+  border-color: rgba(77,162,255,0.2);
+}
+
+@media (max-width: 600px) {
+  .root {
+    padding: 0 0.55rem;
+  }
+}
