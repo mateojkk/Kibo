@@ -199,6 +199,9 @@ export default function SettingsView({ wallet, onLock, onWalletChange }: Setting
         textTransform: 'uppercase',
         opacity: 0.6,
       }}>
+        <div style={{ marginBottom: '8px' }}>
+          <span style={{ fontSize: '10px', fontWeight: 600, background: 'var(--overlay-hl)', padding: '3px 8px', borderRadius: '6px', color: 'var(--fg-dim)', letterSpacing: '0.04em' }}>testnet</span>
+        </div>
         by parity
       </div>
     </div>

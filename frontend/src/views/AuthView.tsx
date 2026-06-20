@@ -34,15 +34,15 @@ export default function AuthView({ onWallet }: AuthViewProps) {
     setBusy(true);
     setLogs([]);
     setStep('connecting');
-    addLog('Google OAuth verified — deriving wallet keys...');
+    addLog('Google verified — setting up your wallet...');
 
     try {
       // Try login first. If backend returns "invite code required" (new user),
       // prompt for username + invite code.
       try {
-        addLog('Fetching deterministic zkLogin salt...');
+        addLog('Securing your account...');
         const wallet = await loginWithGoogle(credential);
-        addLog('zkLogin session established on Sui Testnet...');
+        addLog('Secure session established...');
         onWallet(wallet);
       } catch (err: any) {
         const detail = err?.response?.data?.detail;
@@ -91,9 +91,9 @@ export default function AuthView({ onWallet }: AuthViewProps) {
     addLog('Querying Salt Service...');
 
     try {
-      addLog('Deriving cryptographic keypairs...');
+      addLog('Securing your account...');
       const wallet = await loginWithGoogle(pendingCredential, cleanUsername);
-      addLog('Registering Kibo identity on-chain...');
+      addLog('Setting up your identity...');
       addLog('Account successfully initialized!');
       onWallet(wallet);
     } catch (err: any) {
@@ -109,20 +109,21 @@ export default function AuthView({ onWallet }: AuthViewProps) {
     <div className={authStyles['auth-view']}>
       <div className={authStyles['auth-left']}>
         <div className={authStyles['auth-left-content']}>
-          <h1>Kibo <span style={{ fontSize: '16px', fontWeight: 600, background: 'rgba(255,255,255,0.2)', padding: '4px 10px', borderRadius: '8px', verticalAlign: 'middle', color: '#fff', marginLeft: '8px' }}>TESTNET</span></h1>
-          <p>Private conversational payments on Sui.</p>
+          <img src="/logo.png" alt="kibo logo" style={{ width: '96px', height: '96px', borderRadius: '20px', marginBottom: '16px', objectFit: 'cover', filter: 'invert(1) contrast(1.2)' }} />
+          <h1 style={{ color: 'var(--bg)', marginBottom: '8px', fontSize: '36px', fontWeight: 300, letterSpacing: '-0.02em' }}>Kibo</h1>
+          <p style={{ color: 'var(--bg)', fontSize: '16px', fontWeight: 500 }}>Private conversational payments on Sui.</p>
         </div>
       </div>
       <div className={authStyles['auth-right']}>
         <div className={authStyles['auth-panel']}>
           <div className={authStyles['auth-header']}>
-            <div className={authStyles['auth-logo-box']}>K</div>
+            <img src="/logo.png" alt="kibo" style={{ width: '48px', height: '48px', borderRadius: '14px', objectFit: 'cover' }} />
             <p className={authStyles['auth-tagline']}>
               {step === 'signin'
                 ? 'Sign in to continue'
                 : step === 'username'
                   ? 'Choose your username'
-                  : 'Authenticating on Sui Testnet...'}
+                  : 'Authenticating...'}
             </p>
           </div>
 
@@ -130,7 +131,7 @@ export default function AuthView({ onWallet }: AuthViewProps) {
             {step === 'signin' && (
               <div className={authStyles['auth-flow']}>
                 <p className={authStyles['auth-note']}>
-                  Sign in with your Google account using zkLogin. Your keys are derived passwordlessly in the browser.
+                  Sign in securely with your Google account to access your Kibo wallet.
                 </p>
                 <div className={authStyles['auth-actions']}>
                   <button
@@ -145,7 +146,7 @@ export default function AuthView({ onWallet }: AuthViewProps) {
                       <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l3.66-2.85z"/>
                       <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
                     </svg>
-                    Sign in with Google zkLogin
+                    Continue with Google
                   </button>
                 </div>
               </div>
@@ -183,7 +184,7 @@ export default function AuthView({ onWallet }: AuthViewProps) {
               <div className={authStyles['auth-logs-container']}>
                 <div className={authStyles['auth-spinner-container']}>
                   <span className={authStyles['auth-spinner']} />
-                  <span style={{ fontSize: 13, color: 'var(--fg)' }}>Assembling zkLogin Wallet...</span>
+                  <span style={{ fontSize: 13, color: 'var(--fg)' }}>Setting up your wallet...</span>
                 </div>
                 <div className={authStyles['auth-logs']}>
                   {logs.map((log, idx) => (

@@ -52,8 +52,7 @@ export default function AppShell({
       {/* Header */}
       <header className={styles['app-header']}>
         <div className={styles['app-logo']} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <img src="/favicon.png" alt="kibo" className={styles['app-logo-img']} />
-          <span style={{ fontSize: '11px', fontWeight: 600, background: 'var(--overlay-hl)', padding: '3px 8px', borderRadius: '6px', color: 'var(--fg-dim)', letterSpacing: '0.04em' }}>TESTNET</span>
+          <img src="/logo.png" alt="kibo" className={styles['app-logo-img']} />
         </div>
         <div
           className={styles['app-user-badge']}

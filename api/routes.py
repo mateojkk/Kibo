@@ -111,9 +111,11 @@ def audit_log(supabase, user_id: Optional[str], action: str, request: Request, s
             "user_id": user_id,
             "action": action,
             "status": status,
-            "detail": detail,
-            "ip": request.client.host if request.client else "",
-            "ua": request.headers.get("user-agent", ""),
+            "request_meta": {
+                "detail": detail,
+                "ip": request.client.host if request.client else "",
+                "ua": request.headers.get("user-agent", "")
+            },
             "created_at": now_iso(),
         }
     ).execute()

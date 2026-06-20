@@ -20,7 +20,7 @@
 
 .auth-left-content {
   text-align: center;
-  color: #fff;
+  color: var(--fg);
 }
 
 .auth-left-content h1 {
@@ -73,7 +73,7 @@
   border-radius: 18px;
   object-fit: cover;
   margin-bottom: 14px;
-  box-shadow: 0 0 32px rgba(123,186,145,0.15);
+  box-shadow: 0 0 32px rgba(184,138,98,0.2);
 }
 
 .auth-panel {
@@ -114,10 +114,13 @@
 }
 
 .auth-field label {
-  color: var(--fg-muted);
-  font-size: 11px;
+  color: var(--fg);
+  font-size: 13px;
+  font-weight: 500;
   letter-spacing: 0.02em;
-  margin-bottom: 3px;
+  margin-bottom: 6px;
+  text-align: center;
+  display: block;
 }
 
 .auth-input {
@@ -128,7 +131,8 @@
   border-radius: 0 !important;
   padding: 10px 0 9px !important;
   color: var(--fg) !important;
-  font-size: 16px !important;
+  font-size: 18px !important;
+  text-align: center !important;
   box-shadow: none !important;
   transition: border-bottom-color 0.15s ease, box-shadow 0.15s ease !important;
 }
@@ -152,10 +156,11 @@
 .auth-note {
   width: min(360px, 100%);
   margin: -2px auto 0;
-  color: var(--fg-muted);
-  font-size: 12px;
-  line-height: 1.45;
-  text-align: left;
+  color: var(--fg-dim);
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.5;
+  text-align: center;
 }
 
 .auth-actions {
@@ -386,7 +391,7 @@ button.auth-divider:hover {
     max-width: 100%;
     min-height: 100dvh;
     padding: max(18px, env(safe-area-inset-top)) 20px max(18px, env(safe-area-inset-bottom));
-    background: url('/login-image.jpg') center/cover no-repeat;
+    background: linear-gradient(rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.5)), url('/login-image.jpg') center/cover no-repeat;
   }
 
   .auth-left {
@@ -410,9 +415,9 @@ button.auth-divider:hover {
   }
 
   .auth-tagline {
-    font-size: 13px;
-    color: #fff;
-    margin-bottom: 18px;
+    font-size: 15px;
+    color: var(--fg);
+    margin-bottom: 24px;
     text-align: center;
   }
 
@@ -429,28 +434,33 @@ button.auth-divider:hover {
   }
 
   .auth-field label {
-    color: #fff;
-    font-size: 12px;
+    color: var(--fg);
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 8px;
+    text-align: center;
   }
 
   .auth-input {
-    border-bottom-color: rgba(255,255,255,0.4) !important;
-    color: #fff !important;
+    border-bottom-color: var(--border) !important;
+    color: var(--fg) !important;
   }
 
   .auth-input:focus {
     border-bottom-color: var(--accent) !important;
-    box-shadow: 0 10px 22px -16px rgba(255,255,255,0.9) !important;
+    box-shadow: 0 10px 22px -16px var(--accent-dim) !important;
     outline: none;
   }
 
   .auth-input::placeholder {
-    color: rgba(255,255,255,0.5);
+    color: var(--fg-muted);
   }
 
   .auth-note {
-    color: rgba(255,255,255,0.7);
-    font-size: 12px;
+    color: var(--fg-dim);
+    font-size: 14px;
+    font-weight: 400;
+    text-align: center;
   }
 
   .auth-actions button {
@@ -458,8 +468,9 @@ button.auth-divider:hover {
   }
 
   .auth-link {
-    color: rgba(255,255,255,0.7);
-    font-size: 13px;
+    color: var(--fg);
+    font-size: 14px;
+    font-weight: 500;
   }
 
   .auth-note,
@@ -509,7 +520,7 @@ button.auth-divider:hover {
   .auth-left {
     width: 50%;
     height: 100vh;
-    background: url('/login-image.jpg') center/cover no-repeat;
+    background: linear-gradient(rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.5)), url('/login-image.jpg') center/cover no-repeat;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -518,6 +529,7 @@ button.auth-divider:hover {
 
   .auth-right {
     width: 50%;
+    max-width: none;
     height: 100vh;
     display: flex;
     align-items: center;
