@@ -185,21 +185,15 @@ export function useTerminalController(options: UseTerminalOptions = {}) {
           }
 
           let primaryCoinInput;
-          if (token.address === '0x2::sui::SUI') {
-            // SUI can be split directly from gas
-            const [splitCoin] = tx.splitCoins(tx.gas, [tx.pure.u64(amountRaw)]);
-            primaryCoinInput = splitCoin;
-          } else {
-            const firstCoin = coinsData.data[0].coinObjectId;
-            const primaryCoin = tx.object(firstCoin);
-            
-            // Merge remaining coin objects if multiple exist
-            if (coinsData.data.length > 1) {
-              tx.mergeCoins(primaryCoin, coinsData.data.slice(1).map(c => tx.object(c.coinObjectId)));
-            }
-            const [splitCoin] = tx.splitCoins(primaryCoin, [tx.pure.u64(amountRaw)]);
-            primaryCoinInput = splitCoin;
+          const firstCoin = coinsData.data[0].coinObjectId;
+          const primaryCoin = tx.object(firstCoin);
+          
+          // Merge remaining coin objects if multiple exist
+          if (coinsData.data.length > 1) {
+            tx.mergeCoins(primaryCoin, coinsData.data.slice(1).map(c => tx.object(c.coinObjectId)));
           }
+          const [splitCoin] = tx.splitCoins(primaryCoin, [tx.pure.u64(amountRaw)]);
+          primaryCoinInput = splitCoin;
 
           // Call deposit
           tx.moveCall({
@@ -242,28 +236,39 @@ export function useTerminalController(options: UseTerminalOptions = {}) {
           push({ kind: 'info', text: `preparing public transfer of ${amount} ${token.symbol} → @${recipient.label}...` });
           
           const tx = new Transaction();
-          const coinsData = await suiClient.getCoins({ owner: wallet.address, coinType: token.address });
-          if (coinsData.data.length === 0) {
-            throw new Error(`No ${token.symbol} coin objects found in wallet.`);
-          }
 
-          let splitCoin;
           if (token.address === '0x2::sui::SUI') {
             const [sCoin] = tx.splitCoins(tx.gas, [tx.pure.u64(amountRaw)]);
-            splitCoin = sCoin;
+            tx.transferObjects([sCoin], recipient.address);
           } else {
+            const coinsData = await suiClient.getCoins({ owner: wallet.address, coinType: token.address });
+            if (coinsData.data.length === 0) {
+              throw new Error(`No ${token.symbol} coin objects found in wallet.`);
+            }
             const primaryCoin = tx.object(coinsData.data[0].coinObjectId);
             if (coinsData.data.length > 1) {
               tx.mergeCoins(primaryCoin, coinsData.data.slice(1).map(c => tx.object(c.coinObjectId)));
             }
             const [sCoin] = tx.splitCoins(primaryCoin, [tx.pure.u64(amountRaw)]);
-            splitCoin = sCoin;
+            tx.transferObjects([sCoin], recipient.address);
+            
+            // Native protocol-level gasless exemption
+            tx.setGasPrice(0);
+            tx.setGasBudget(0);
+            tx.setGasPayment([]);
           }
 
-          tx.transferObjects([splitCoin], recipient.address);
-
-          push({ kind: 'info', text: `submitting public transaction (gasless Relayer)...` });
-          const digest = await executeSponsoredTransaction(wallet, tx);
+          push({ kind: 'info', text: `submitting public transaction...` });
+          
+          if (!wallet.keypair) throw new Error('Wallet missing keypair');
+          tx.setSender(wallet.address);
+          
+          const result = await suiClient.signAndExecuteTransaction({
+            signer: wallet.keypair,
+            transaction: tx,
+            options: { showEffects: true }
+          });
+          const digest = result.digest;
 
           await baseApi.post('/activity', {
             txHash: digest,
