@@ -170,7 +170,7 @@ export default function KiboChatInput({
               onChange={(e) => setValue(e.target.value)}
               onKeyDown={handleTextKeyDown}
               disabled={disabled}
-              placeholder={isPrivateMode ? 'Private message (Shielded)...' : 'Public message (Direct)...'}
+              placeholder="type 'help' to get started"
               rows={1}
             />
           )}
