@@ -160,11 +160,14 @@ export default function AppShell({
           onClick={handleRequestFaucet}
           icon={
             <svg className={styles['tab-icon']} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/>
+              <path d="M4 8h6a2 2 0 0 1 2 2v4" />
+              <path d="M12 18v3" />
+              <path d="M9 5v6" />
+              <path d="M7 5h4" />
             </svg>
           }
         />
-        <div style={{ flexGrow: 1 }} />
+        <div className={styles['mobile-hidden-tab']} style={{ flexGrow: 1 }} />
         <TabItem
           id="settings"
           label="Settings"
