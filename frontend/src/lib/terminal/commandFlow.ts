@@ -212,6 +212,26 @@ export async function handleCommand(
     const { askGroq } = await import('../llm');
     const reply = await askGroq(cmd.raw, isPrivateMode);
     setBusy(false);
+    
+    // Check if the LLM outputted a command
+    const cmdMatch = reply.match(/<CMD:\s*(.*?)>/i);
+    if (cmdMatch) {
+      const extractedCmd = cmdMatch[1].trim();
+      // Remove the <CMD:...> part from the text shown to the user
+      const cleanReply = reply.replace(/<CMD:\s*(.*?)>/i, '').trim();
+      if (cleanReply) {
+         push({ kind: 'output', text: cleanReply });
+      }
+      
+      // Parse and execute the extracted command
+      const { parseCommand } = await import('../commandParser');
+      const parsedCmd = parseCommand(extractedCmd);
+      return await handleCommand({
+        cmd: parsedCmd,
+        wallet, setWallet, setStep, setContacts, setBusy, setLines, bootLines, push, isPrivateMode
+      });
+    }
+
     push({ kind: 'output', text: reply });
     return true;
   }

@@ -28,8 +28,8 @@ export function useTerminalController(options: UseTerminalOptions = {}) {
   const [contacts, setContacts] = useState<Awaited<ReturnType<typeof getContacts>>>([]);
   const [step, setStep] = useState<Step>(null);
   
-  // Private-by-default toggle
-  const [isPrivateMode, setIsPrivateMode] = useState<boolean>(true);
+  // Private-by-default toggle (changed to false by user request)
+  const [isPrivateMode, setIsPrivateMode] = useState<boolean>(false);
   
   const syncingRef = useRef(false);
 

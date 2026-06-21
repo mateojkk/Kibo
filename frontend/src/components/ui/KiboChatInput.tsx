@@ -29,7 +29,7 @@ export default function KiboChatInput({
   history,
   quickActions,
   submitLabel = 'Send',
-  isPrivateMode = true,
+  isPrivateMode = false,
   setIsPrivateMode,
 }: KiboChatInputProps) {
   const [value, setValue] = useState('');
@@ -173,8 +173,12 @@ export default function KiboChatInput({
                 className={`${styles.toggleButton} ${isPrivateMode ? styles.privateActive : styles.privateInactive}`}
                 onClick={() => setIsPrivateMode(!isPrivateMode)}
                 title={isPrivateMode ? 'Private Mode Active (Transactions are Shielded)' : 'Private Mode Inactive (Transactions are Public)'}
+                style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '4px 10px', borderRadius: '12px', background: isPrivateMode ? 'var(--accent-alpha)' : 'transparent', border: isPrivateMode ? '1px solid var(--accent)' : '1px solid var(--border-hl)', color: isPrivateMode ? 'var(--accent)' : 'var(--fg-muted)' }}
               >
-                {isPrivateMode ? <Lock size={16} /> : <Unlock size={16} />}
+                {isPrivateMode ? <Lock size={14} /> : <Unlock size={14} />}
+                <span style={{ fontSize: '11px', fontWeight: 500, letterSpacing: '0.02em', textTransform: 'uppercase' }}>
+                  {isPrivateMode ? 'Shielded' : 'Public'}
+                </span>
               </button>
             )}
           </div>
