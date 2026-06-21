@@ -123,8 +123,12 @@ export default function HomeView({
                 <div className={homeStyles['asset-info']}>
                   <TokenIcon symbol={asset.symbol} />
                   <div className={homeStyles['asset-meta']}>
-                    <span className={homeStyles['asset-symbol']}>{asset.symbol}</span>
-                    <span className={homeStyles['asset-name']}>{asset.name}</span>
+                    <span className={homeStyles['asset-symbol']}>
+                      {asset.symbol === 'USDC' ? '$' : asset.symbol}
+                    </span>
+                    <span className={homeStyles['asset-name']}>
+                      {asset.symbol === 'USDC' ? 'Digital Dollar' : asset.name}
+                    </span>
                   </div>
                 </div>
                 <div className={homeStyles['asset-balance-container']}>

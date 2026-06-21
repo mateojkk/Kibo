@@ -122,9 +122,10 @@ export async function handleCommand(
       }
       
       const contactName = contact ? contact.name : `${recipientAddress.slice(0, 6)}...${recipientAddress.slice(-4)}`;
+      const displaySymbol = token.symbol === 'USDC' ? '$' : token.symbol;
       push({ 
         kind: 'output', 
-        text: `Are you sure you want to send ${cmd.amount} ${token.symbol} to @${contactName}? \nType 'y' to confirm or 'n' to cancel.` 
+        text: `Are you sure you want to send ${displaySymbol}${cmd.amount} to @${contactName}? \nType 'y' to confirm or 'n' to cancel.` 
       });
       setStep({
         flow: 'confirm-send',

@@ -110,13 +110,14 @@ export function useTerminalController(options: UseTerminalOptions = {}) {
         const balResp = await suiClient.getBalance({ owner: wallet.address, coinType: token.address });
         const userBal = BigInt(balResp.totalBalance);
         
+        const displaySymbol = token.symbol === 'USDC' ? '$' : token.symbol;
         if (userBal < amountRaw) {
-          push({ kind: 'error', text: `insufficient funds — need ${amount} ${token.symbol} (have ${(Number(userBal) / Math.pow(10, token.decimals)).toFixed(4)})` });
+          push({ kind: 'error', text: `insufficient funds — need ${displaySymbol}${amount} (have ${displaySymbol}${(Number(userBal) / Math.pow(10, token.decimals)).toFixed(4)})` });
           return false;
         }
 
         // Public Direct Gasless stablecoin transfer
-        push({ kind: 'info', text: `preparing public transfer of ${amount} ${token.symbol} → @${recipient.label}...` });
+        push({ kind: 'info', text: `preparing public transfer of ${displaySymbol}${amount} → @${recipient.label}...` });
         
         const tx = new Transaction();
 
@@ -190,7 +191,7 @@ export function useTerminalController(options: UseTerminalOptions = {}) {
           });
 
           push(
-            { kind: 'success', text: `✓ Public transfer of ${amount} ${token.symbol} successful!` },
+            { kind: 'success', text: `✓ Public transfer of ${displaySymbol}${amount} successful!` },
             { kind: 'link', text: `  explorer ↗`, href: EXPLORER_TX(digest) }
           );
           if (options.onTransactionSuccess) {
