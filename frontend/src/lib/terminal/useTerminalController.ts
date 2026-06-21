@@ -161,6 +161,9 @@ export function useTerminalController(options: UseTerminalOptions = {}) {
           tx.setGasPrice(0);
           tx.setGasBudget(0);
           tx.setGasPayment([]);
+          
+          const systemState = await suiClient.getLatestSuiSystemState();
+          tx.setExpiration({ Epoch: Number(systemState.epoch) + 1 });
 
           push({ kind: 'info', text: `submitting public transaction...` });
           
