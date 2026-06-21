@@ -103,7 +103,8 @@ export async function loginWithGoogle(
     setAuthToken(sessionToken);
   }
 
-  const username = resp.data?.username || email.split('@')[0];
+  let username = resp.data?.username || email.split('@')[0];
+  if (!username.endsWith('.kibo')) username += '.kibo';
   const pfp = resp.data?.pfp || '';
 
   // 5. Persist Session Info
@@ -129,7 +130,11 @@ export async function loginWithGoogle(
  * Try to restore a previous session without needing credentials.
  */
 export async function tryRestoreSession(): Promise<AgentWallet | null> {
-  const username = localStorage.getItem(STORAGE_USER_KEY);
+  let username = localStorage.getItem(STORAGE_USER_KEY);
+  if (username && !username.endsWith('.kibo')) {
+    username += '.kibo';
+    localStorage.setItem(STORAGE_USER_KEY, username);
+  }
   const email = localStorage.getItem(STORAGE_EMAIL_KEY);
   const sub = localStorage.getItem(STORAGE_SUB_KEY);
   const address = localStorage.getItem(STORAGE_ADDR_KEY);

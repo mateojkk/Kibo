@@ -15,11 +15,9 @@ interface SettingsViewProps {
 }
 
 export default function SettingsView({ wallet, onLock, onWalletChange }: SettingsViewProps) {
-  const [pinSection, setPinSection] = useState<'idle' | 'set' | 'done'>('idle');
-  const [pin, setPin] = useState('');
-  const [pinConfirm, setPinConfirm] = useState('');
+  const [editingUsername, setEditingUsername] = useState(false);
+  const [newUsername, setNewUsername] = useState(wallet.username.replace(/\.kibo$/, ''));
   const [busy, setBusy] = useState(false);
-  const [error, setError] = useState('');
 
   const shortAddr = `${wallet.address.slice(0, 10)}…${wallet.address.slice(-8)}`;
 
@@ -57,20 +55,21 @@ export default function SettingsView({ wallet, onLock, onWalletChange }: Setting
     toast.success('Address copied');
   };
 
-  const handleSetPin = async (e: React.FormEvent) => {
+  const handleSaveUsername = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
-    if (!/^\d{4,12}$/.test(pin)) { setError('PIN must be 4–12 digits'); return; }
-    if (pin !== pinConfirm) { setError('PINs do not match'); return; }
+    if (!newUsername.trim()) return;
     setBusy(true);
     try {
-      await baseApi.post('/auth/pin', { pin });
-      toast.success('Transaction PIN set');
-      setPinSection('done');
-      setPin('');
-      setPinConfirm('');
-    } catch (e: any) {
-      setError(e.response?.data?.detail || 'Failed to set PIN');
+      await baseApi.put('/auth/profile', { username: newUsername.trim() });
+      toast.success('Username updated');
+      setEditingUsername(false);
+      onWalletChange({
+        ...wallet,
+        username: newUsername.trim() + '.kibo',
+      });
+      localStorage.setItem('kibo_user', newUsername.trim() + '.kibo');
+    } catch (err: any) {
+      toast.error(err.response?.data?.detail || 'Failed to update username');
     } finally {
       setBusy(false);
     }
@@ -117,13 +116,55 @@ export default function SettingsView({ wallet, onLock, onWalletChange }: Setting
           <span className={settingsStyles['settings-item-value']}>{shortAddr}</span>
         </div>
 
-        <div className={settingsStyles['settings-item']} style={{ cursor: 'default' }}>
-          <div className={settingsStyles['settings-item-label']}>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="8" r="4"/><path d="M20 21a8 8 0 1 0-16 0"/></svg>
-            Username
+        {editingUsername ? (
+          <div className={surfaceStyles.card} style={{ borderRadius: 'var(--radius-sm)', margin: '4px 0' }}>
+            <form onSubmit={handleSaveUsername}>
+              <div className={formStyles.field}>
+                <label>Change Username</label>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <input
+                    type="text"
+                    value={newUsername}
+                    onChange={e => setNewUsername(e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, ''))}
+                    placeholder="username"
+                    autoFocus
+                  />
+                  <span style={{ color: 'var(--fg-muted)' }}>.kibo</span>
+                </div>
+              </div>
+              <div style={{ display: 'flex', gap: '8px', marginTop: 12 }}>
+                <button
+                  className={`${formStyles.btn} ${formStyles['btn-secondary']}`}
+                  type="button"
+                  onClick={() => setEditingUsername(false)}
+                  disabled={busy}
+                  style={{ flex: 1 }}
+                >
+                  Cancel
+                </button>
+                <button
+                  className={`${formStyles.btn} ${formStyles['btn-primary']}`}
+                  type="submit"
+                  disabled={busy || !newUsername.trim()}
+                  style={{ flex: 1 }}
+                >
+                  {busy ? 'Saving…' : 'Save'}
+                </button>
+              </div>
+            </form>
           </div>
-          <span className={settingsStyles['settings-item-value']}>@{wallet.username}</span>
-        </div>
+        ) : (
+          <div className={settingsStyles['settings-item']} onClick={() => setEditingUsername(true)}>
+            <div className={settingsStyles['settings-item-label']}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="8" r="4"/><path d="M20 21a8 8 0 1 0-16 0"/></svg>
+              Username
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span className={settingsStyles['settings-item-value']}>{wallet.username}</span>
+              <svg className={settingsStyles['settings-chevron']} width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="9 18 15 12 9 6"/></svg>
+            </div>
+          </div>
+        )}
 
         <a
           className={settingsStyles['settings-item']}
@@ -138,43 +179,6 @@ export default function SettingsView({ wallet, onLock, onWalletChange }: Setting
           </div>
           <svg className={settingsStyles['settings-chevron']} width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="9 18 15 12 9 6"/></svg>
         </a>
-      </div>
-
-      {/* Security */}
-      <div className={settingsStyles['settings-group']}>
-        <div className={layoutStyles['section-title']} style={{ padding: '0 0 4px' }}>Security</div>
-
-        <div className={settingsStyles['settings-item']} onClick={() => { setPinSection(p => p === 'idle' ? 'set' : 'idle'); setError(''); }}>
-          <div className={settingsStyles['settings-item-label']}>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-            Set Transaction PIN
-          </div>
-          <svg className={settingsStyles['settings-chevron']} width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points={pinSection === 'set' ? '18 15 12 9 6 15' : '6 9 12 15 18 9'}/></svg>
-        </div>
-
-        {pinSection === 'set' && (
-          <div className={surfaceStyles.card} style={{ borderRadius: 'var(--radius-sm)', margin: '4px 0' }}>
-            <form onSubmit={handleSetPin}>
-              <div className={formStyles.field}>
-                <label>New PIN (4–12 digits)</label>
-                <input type="password" inputMode="numeric" value={pin} onChange={e => setPin(e.target.value)} placeholder="••••" />
-              </div>
-              <div className={formStyles.field}>
-                <label>Confirm PIN</label>
-                <input type="password" inputMode="numeric" value={pinConfirm} onChange={e => setPinConfirm(e.target.value)} placeholder="••••" />
-              </div>
-              {error && <div className={formStyles['auth-error']}>{error}</div>}
-              <button
-                className={`${formStyles.btn} ${formStyles['btn-primary']}`}
-                type="submit"
-                disabled={busy}
-                style={{ marginTop: 12 }}
-              >
-                {busy ? 'Saving…' : 'Set PIN'}
-              </button>
-            </form>
-          </div>
-        )}
       </div>
 
       {/* Session */}
