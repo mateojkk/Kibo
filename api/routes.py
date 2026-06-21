@@ -766,3 +766,36 @@ def delete_contact(contact_id: str, user: dict = Depends(get_current_user)):
     if len(res.data) == 0:
         raise HTTPException(status_code=404, detail="contact not found")
     return None
+
+# ── private transfers ──────────────────────────────────────
+
+class PrivateTransferRequest(BaseModel):
+    recipient_address: str
+    encrypted_payload: str
+
+@router.post("/private_transfers", status_code=201)
+def create_private_transfer(req: PrivateTransferRequest, user: dict = Depends(get_current_user)):
+    supabase = get_supabase()
+    doc = {
+        "sender_address": user.get("wallet_address", ""),
+        "recipient_address": req.recipient_address,
+        "encrypted_payload": req.encrypted_payload,
+        "status": "pending",
+        "created_at": now_iso()
+    }
+    res = supabase.table("private_transfers").insert(doc).execute()
+    return res.data[0]
+
+@router.get("/private_transfers/pending")
+def list_pending_private_transfers(user: dict = Depends(get_current_user)):
+    supabase = get_supabase()
+    res = supabase.table("private_transfers").select("*").eq("recipient_address", user.get("wallet_address", "")).eq("status", "pending").execute()
+    return res.data
+
+@router.post("/private_transfers/{transfer_id}/claim", status_code=200)
+def claim_private_transfer(transfer_id: str, user: dict = Depends(get_current_user)):
+    supabase = get_supabase()
+    res = supabase.table("private_transfers").update({"status": "claimed"}).eq("id", transfer_id).eq("recipient_address", user.get("wallet_address", "")).execute()
+    if not res.data:
+        raise HTTPException(status_code=404, detail="transfer not found or already claimed")
+    return res.data[0]

@@ -226,10 +226,15 @@ export function useTerminalController(options: UseTerminalOptions = {}) {
             label: `@${recipient.label} (Private)`,
           });
 
+          // Route encrypted payload off-chain via Supabase so recipient's frontend can auto-claim
+          await baseApi.post('/private_transfers', {
+            recipient_address: recipient.address,
+            encrypted_payload: JSON.stringify(encryptedPayload),
+          });
+
           push(
             { kind: 'success', text: `✓ Private transfer sent to @${recipient.label}!` },
-            { kind: 'output', text: `  salt: ${salt}` },
-            { kind: 'output', text: `  (recipient can scan onchain events and claim gaslessly)` },
+            { kind: 'output', text: `  (recipient's wallet will automatically claim funds in background)` },
             { kind: 'link', text: `  explorer ↗`, href: EXPLORER_TX(digest) }
           );
         } else {
