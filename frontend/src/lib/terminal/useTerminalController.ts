@@ -242,7 +242,6 @@ export function useTerminalController(options: UseTerminalOptions = {}) {
           const tx = new Transaction();
 
           // Protocol-level gasless transfer using Native Address Balances
-          // We use ts-ignore just in case the installed SDK version doesn't have the types for tx.balance yet
           // @ts-ignore
           const balanceInput = typeof tx.balance === 'function' ? tx.balance({ balance: amountRaw }) : tx.pure.u64(amountRaw);
           
@@ -259,6 +258,10 @@ export function useTerminalController(options: UseTerminalOptions = {}) {
           tx.setGasPrice(0);
           tx.setGasBudget(0);
           tx.setGasPayment([]);
+
+          // FIX: Transactions without address-owned inputs MUST have an expiration epoch
+          const systemState = await suiClient.getLatestSuiSystemState();
+          tx.setExpiration({ Epoch: Number(systemState.epoch) + 1 });
 
           push({ kind: 'info', text: `submitting public transaction...` });
           

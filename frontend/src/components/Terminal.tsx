@@ -40,6 +40,7 @@ export default function Terminal({ wallet: externalWallet, onWalletChange }: Ter
     <div
       className={styles['terminal-root']}
       onClick={(e) => {
+        if (window.getSelection()?.toString()) return;
         (e.currentTarget as HTMLElement)
           .querySelector<HTMLInputElement>('[data-command-input]')
           ?.focus();
