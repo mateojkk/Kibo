@@ -61,7 +61,7 @@ export default function HomeView({
     <div className={homeStyles['home-container']}>
       {/* Balance card */}
       <div className={homeStyles['balance-card']}>
-        <div className={homeStyles['balance-label']}>Total Portfolio Value (Mock USD)</div>
+        <div className={homeStyles['balance-label']}>Total Portfolio Value</div>
         <div className={homeStyles['balance-amount']}>
           {balanceLoading ? (
             <span style={{ color: 'var(--fg-muted)', fontSize: 28 }}>Loading…</span>
@@ -115,7 +115,7 @@ export default function HomeView({
 
       {/* Assets list */}
       <div className={homeStyles['asset-section']}>
-        <div className={homeStyles['asset-title']}>Asset Accounts (Sui Testnet)</div>
+        <div className={homeStyles['asset-title']}>Asset Accounts</div>
         <div className={homeStyles['asset-list']}>
           {assets.filter(a => ['USDC', 'USDsui'].includes(a.symbol)).map((asset) => {
             return (
