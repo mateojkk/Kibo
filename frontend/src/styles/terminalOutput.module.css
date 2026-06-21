@@ -6,7 +6,7 @@
 
 .term-row {
   display: flex;
-  padding: 0 0.85rem;
+  padding: 0 1.5rem;
 }
 
 .row-user {
@@ -98,7 +98,7 @@
 
 @media (max-width: 600px) {
   .term-row {
-    padding: 0 0.55rem;
+    padding: 0 1rem;
   }
 
   .term-bubble {
