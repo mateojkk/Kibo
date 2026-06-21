@@ -241,16 +241,19 @@ export function useTerminalController(options: UseTerminalOptions = {}) {
             const [sCoin] = tx.splitCoins(tx.gas, [tx.pure.u64(amountRaw)]);
             tx.transferObjects([sCoin], recipient.address);
           } else {
-            const coinsData = await suiClient.getCoins({ owner: wallet.address, coinType: token.address });
-            if (coinsData.data.length === 0) {
-              throw new Error(`No ${token.symbol} coin objects found in wallet.`);
-            }
-            const primaryCoin = tx.object(coinsData.data[0].coinObjectId);
-            if (coinsData.data.length > 1) {
-              tx.mergeCoins(primaryCoin, coinsData.data.slice(1).map(c => tx.object(c.coinObjectId)));
-            }
-            const [sCoin] = tx.splitCoins(primaryCoin, [tx.pure.u64(amountRaw)]);
-            tx.transferObjects([sCoin], recipient.address);
+            // Protocol-level gasless transfer using Native Address Balances
+            // We use ts-ignore just in case the installed SDK version doesn't have the types for tx.balance yet
+            // @ts-ignore
+            const balanceInput = typeof tx.balance === 'function' ? tx.balance({ balance: amountRaw }) : tx.pure.u64(amountRaw);
+            
+            tx.moveCall({
+              target: '0x2::balance::send_funds',
+              typeArguments: [token.address],
+              arguments: [
+                balanceInput,
+                tx.pure.address(recipient.address)
+              ]
+            });
             
             // Native protocol-level gasless exemption
             tx.setGasPrice(0);
