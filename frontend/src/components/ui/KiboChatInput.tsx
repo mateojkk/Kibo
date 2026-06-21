@@ -136,17 +136,6 @@ export default function KiboChatInput({
       )}
 
       <div className={`${styles.composer} ${isPrivateMode && !isPassword ? styles.composerPrivate : ''}`}>
-        {setIsPrivateMode && !isPassword && (
-          <button
-            type="button"
-            className={`${styles.toggleButton} ${isPrivateMode ? styles.privateActive : styles.privateInactive}`}
-            onClick={() => setIsPrivateMode(!isPrivateMode)}
-            title={isPrivateMode ? 'Private Mode Active (Transactions are Shielded)' : 'Private Mode Inactive (Transactions are Public)'}
-          >
-            {isPrivateMode ? <Lock size={16} /> : <Unlock size={16} />}
-          </button>
-        )}
-
         <div className={styles.inputWrap}>
           {isPassword ? (
             <input
@@ -176,15 +165,29 @@ export default function KiboChatInput({
           )}
         </div>
 
-        <button
-          type="button"
-          className={styles.sendButton}
-          onClick={submitCommand}
-          disabled={disabled || (!isPassword && !value.trim())}
-          aria-label={submitLabel}
-        >
-          <ArrowUp size={16} />
-        </button>
+        <div className={styles.composerFooter}>
+          <div className={styles.composerFooterLeft}>
+            {setIsPrivateMode && !isPassword && (
+              <button
+                type="button"
+                className={`${styles.toggleButton} ${isPrivateMode ? styles.privateActive : styles.privateInactive}`}
+                onClick={() => setIsPrivateMode(!isPrivateMode)}
+                title={isPrivateMode ? 'Private Mode Active (Transactions are Shielded)' : 'Private Mode Inactive (Transactions are Public)'}
+              >
+                {isPrivateMode ? <Lock size={16} /> : <Unlock size={16} />}
+              </button>
+            )}
+          </div>
+          <button
+            type="button"
+            className={styles.sendButton}
+            onClick={submitCommand}
+            disabled={disabled || (!isPassword && !value.trim())}
+            aria-label={submitLabel}
+          >
+            <ArrowUp size={16} />
+          </button>
+        </div>
       </div>
 
       {suggestions.length > 0 && (
@@ -202,6 +205,12 @@ export default function KiboChatInput({
               {suggestion}
             </button>
           ))}
+        </div>
+      )}
+
+      {!isPassword && (
+        <div className={styles.disclaimer}>
+          <Lock size={10} /> Private · zero data retention — your chats are never training data.
         </div>
       )}
     </div>
