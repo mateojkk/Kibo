@@ -41,23 +41,29 @@ export function parseCommand(input: string): Command {
     }
   }
 
-  // send <amount> [tokenSymbol] to <name|address>
-  const sendMatchWithToken = lower.match(/^send\s+([\d.]+)\s+([a-zA-Z0-9.-]+)\s+to\s+(.+)$/);
-  if (sendMatchWithToken) {
-    const amount = parseFloat(sendMatchWithToken[1]);
-    const tokenSymbol = sendMatchWithToken[2];
-    const to = parts.slice(4).join(' ').trim();
-    if (!isNaN(amount) && amount > 0 && to) {
+  // Conversational send matching
+  // Matches: "send 5 usdc to bob", "can you transfer 10 to alice", "pay 5 to @jk"
+  const sendPattern1 = /(?:send|transfer|pay|give|shoot)[^\d]*([\d.]+)\s*(usdc)?\s*(?:to\s+)?@?([a-z0-9.-]+)/i;
+  // Matches: "pay alice 10 usdc"
+  const sendPattern2 = /(?:send|transfer|pay|give|shoot)\s+@?([a-z]+[a-z0-9.-]*)\s+([\d.]+)\s*(usdc)?/i;
+
+  let sendMatch = lower.match(sendPattern1);
+  if (sendMatch) {
+    const amount = parseFloat(sendMatch[1]);
+    const tokenSymbol = sendMatch[2] || 'USDC';
+    const to = sendMatch[3];
+    if (!isNaN(amount) && amount > 0 && to && to !== 'please' && to !== 'usdc') {
       return { type: 'send', amount, to, tokenSymbol };
     }
   }
 
-  const sendMatchSimple = lower.match(/^send\s+([\d.]+)\s+to\s+(.+)$/);
-  if (sendMatchSimple) {
-    const amount = parseFloat(sendMatchSimple[1]);
-    const to = parts.slice(3).join(' ').trim();
-    if (!isNaN(amount) && amount > 0 && to) {
-      return { type: 'send', amount, to };
+  sendMatch = lower.match(sendPattern2);
+  if (sendMatch) {
+    const to = sendMatch[1];
+    const amount = parseFloat(sendMatch[2]);
+    const tokenSymbol = sendMatch[3] || 'USDC';
+    if (!isNaN(amount) && amount > 0 && to && to !== 'please') {
+      return { type: 'send', amount, to, tokenSymbol };
     }
   }
 
@@ -75,15 +81,22 @@ export function parseCommand(input: string): Command {
     return { type: 'pin-set' };
   }
 
+  // Conversational keyword matching
+  if (lower.includes('contact') || lower.includes('book') || lower === 'ls') {
+    return { type: 'contacts' };
+  }
+  if (lower.includes('history') || lower.includes('transaction') || lower.includes('activity')) {
+    return { type: 'history' };
+  }
+  if (lower.includes('help') || lower.includes('what can you do') || lower.includes('menu') || lower === '?') {
+    return { type: 'help' };
+  }
+  if (/^(hi|hello|hey|yo|sup|greetings)\b/i.test(lower) || lower.includes('what\'s up') || lower.includes('whats up')) {
+    return { type: 'greeting' };
+  }
+
   // Single-word commands
   switch (lower) {
-    case 'contacts':
-    case 'book':
-    case 'ls':
-      return { type: 'contacts' };
-    case 'history':
-    case 'hist':
-      return { type: 'history' };
     case 'create':
       return { type: 'create' };
     case 'login':
@@ -93,21 +106,11 @@ export function parseCommand(input: string): Command {
     case 'refresh':
     case 'reload':
       return { type: 'refresh' };
-    case 'help':
-    case '?':
-      return { type: 'help' };
     case 'clear':
     case 'cls':
       return { type: 'clear' };
     case 'whoami':
       return { type: 'whoami' };
-    case 'hi':
-    case 'hey':
-    case 'hello':
-    case 'yo':
-    case 'sup':
-    case 'greetings':
-      return { type: 'greeting' };
     default:
       return { type: 'unknown', raw: trimmed };
   }

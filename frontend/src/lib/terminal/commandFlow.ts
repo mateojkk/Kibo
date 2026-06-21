@@ -156,41 +156,12 @@ export async function handleCommand(
   }
 
   if (cmd.type === 'greeting') {
-    setBusy(true);
-    const { askGroq } = await import('../llm');
-    const rawText = (cmd as any).raw || 'hello';
-    const reply = await askGroq(rawText);
-    setBusy(false);
-    push({ kind: 'output', text: reply });
+    push({ kind: 'output', text: 'hi. type `help` to see what i can do.' });
     return true;
   }
 
   if (cmd.type === 'unknown') {
-    setBusy(true);
-    const { askGroq } = await import('../llm');
-    const reply = await askGroq(cmd.raw);
-    setBusy(false);
-    
-    // Check if the LLM outputted a command
-    const cmdMatch = reply.match(/<CMD:\s*(.*?)>/i);
-    if (cmdMatch) {
-      const extractedCmd = cmdMatch[1].trim();
-      // Remove the <CMD:...> part from the text shown to the user
-      const cleanReply = reply.replace(/<CMD:\s*(.*?)>/i, '').trim();
-      if (cleanReply) {
-         push({ kind: 'output', text: cleanReply });
-      }
-      
-      // Parse and execute the extracted command
-      const { parseCommand } = await import('../commandParser');
-      const parsedCmd = parseCommand(extractedCmd);
-      return await handleCommand({
-        cmd: parsedCmd,
-        wallet, setWallet, setStep, setContacts, setBusy, setLines, bootLines, push
-      });
-    }
-
-    push({ kind: 'output', text: reply });
+    push({ kind: 'error', text: `unknown command: "${cmd.raw}". type \`help\`` });
     return true;
   }
 
