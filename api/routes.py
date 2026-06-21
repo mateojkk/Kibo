@@ -466,13 +466,15 @@ def create_activity(req: ActivityRequest, user: dict = Depends(get_current_user)
         raise HTTPException(status_code=400, detail="invalid tx hash")
     supabase = get_supabase()
     activity_id = str(uuid.uuid4())
+    import json
     supabase.table("activity").insert(
         {
             "id": activity_id,
             "user_id": user["id"],
-            "amount": req.amount,
-            "to": req.to.lower(),
-            "label": req.label or "",
+            "type": "transfer",
+            "status": "completed",
+            "amount_usd": req.amount,
+            "note": json.dumps({"to": req.to.lower(), "label": req.label or ""}),
             "tx_hash": req.txHash,
             "created_at": now_iso(),
         }
@@ -485,13 +487,18 @@ def list_activity(user: dict = Depends(get_current_user)):
     supabase = get_supabase()
     items = []
     res = supabase.table("activity").select("*").eq("user_id", user["id"]).order("created_at", desc=True).limit(20).execute()
+    import json
     for row in res.data:
+        try:
+            note_data = json.loads(row.get("note", "{}"))
+        except Exception:
+            note_data = {}
         items.append(
             {
                 "id": row.get("id"),
-                "amount": row.get("amount"),
-                "to": row.get("to"),
-                "label": row.get("label") or "",
+                "amount": row.get("amount_usd"),
+                "to": note_data.get("to", ""),
+                "label": note_data.get("label", ""),
                 "txHash": row.get("tx_hash"),
                 "createdAt": row.get("created_at"),
             }
@@ -839,4 +846,4 @@ def process_llm_request(req: LLMRequest):
         return {"reply": data["choices"][0]["message"]["content"]}
     except Exception as e:
         print(f"Groq API error: {e}")
-        return {"reply": "i couldn't reach my brain right now... try typing `help`!"}
+        return {"reply": f"Groq API Error: {str(e)}"}
