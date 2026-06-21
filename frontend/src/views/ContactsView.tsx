@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import toast from 'react-hot-toast';
+import { isValidAddress } from '../api';
 import type { Contact } from '../lib/contacts';
 import layoutStyles from '../styles/layout.module.css';
 import formStyles from '../styles/forms.module.css';
@@ -24,7 +25,7 @@ export default function ContactsView({ contacts, onAdd, onRemove }: ContactsView
     e.preventDefault();
     setError('');
     if (!name.trim()) { setError('Name is required'); return; }
-    if (!/^0x[0-9a-fA-F]{40}$/.test(address.trim())) { setError('Invalid Ethereum address'); return; }
+    if (!isValidAddress(address.trim())) { setError('Invalid Sui address'); return; }
     setBusy(true);
     try {
       await onAdd(name.trim().toLowerCase(), address.trim());
@@ -63,7 +64,7 @@ export default function ContactsView({ contacts, onAdd, onRemove }: ContactsView
       <div className={layoutStyles.fullpage} style={{ paddingBottom: 0 }}>
         <div className={contactsStyles['contacts-header']}>
           <div>
-            <div className={layoutStyles['section-title']} style={{ margin: 0 }}>Contacts</div>
+            <div className={layoutStyles['section-title']} style={{ margin: 0 }}>Address Book</div>
             <div className={contactsStyles['contacts-subtitle']}>
               Save people once and send by name later.
             </div>
