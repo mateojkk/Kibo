@@ -24,8 +24,6 @@ export default function Terminal({ wallet: externalWallet, onWalletChange }: Ter
     isPrivateMode,
     setIsPrivateMode,
     handleSubmit,
-    confirmSendTransaction,
-    cancelSendTransaction,
   } = useTerminalController({ wallet: externalWallet, onWalletChange });
 
   useEffect(() => {
@@ -47,27 +45,18 @@ export default function Terminal({ wallet: externalWallet, onWalletChange }: Ter
           ?.focus();
       }}
     >
-      <TerminalBody 
-        lines={lines} 
-        busy={busy} 
-        bottomRef={bottomRef} 
-        step={step}
-        onConfirmSend={confirmSendTransaction}
-        onCancelSend={cancelSendTransaction}
+      <TerminalBody lines={lines} busy={busy} bottomRef={bottomRef} />
+      <TerminalFooter
+        onSubmit={handleSubmit}
+        disabled={busy}
+        history={cmdHistory}
+        isPassword={stepMasksInput(step)}
+        helperText={helperText}
+        quickActions={quickActions}
+        submitLabel={submitLabel}
+        isPrivateMode={isPrivateMode}
+        setIsPrivateMode={setIsPrivateMode}
       />
-      {step?.flow === 'confirm-send' ? null : (
-        <TerminalFooter
-          onSubmit={handleSubmit}
-          disabled={busy}
-          history={cmdHistory}
-          isPassword={stepMasksInput(step)}
-          helperText={helperText}
-          quickActions={quickActions}
-          submitLabel={submitLabel}
-          isPrivateMode={isPrivateMode}
-          setIsPrivateMode={setIsPrivateMode}
-        />
-      )}
     </div>
   );
 }

@@ -164,6 +164,11 @@ export async function handleCommand(
         return true;
       }
       
+      const contactName = contact ? contact.name : `${recipientAddress.slice(0, 6)}...${recipientAddress.slice(-4)}`;
+      push({ 
+        kind: 'output', 
+        text: `Are you sure you want to send ${cmd.amount} ${token.symbol} to @${contactName}? (${isPrivateMode ? 'Private' : 'Public'})\nType 'y' to confirm or 'n' to cancel.` 
+      });
       setStep({
         flow: 'confirm-send',
         pending: { 
@@ -193,12 +198,21 @@ export async function handleCommand(
   }
 
   if (cmd.type === 'greeting') {
-    push({ kind: 'output', text: 'hey, kibo agent at your service 👋' });
+    setBusy(true);
+    const { askGroq } = await import('../llm');
+    const rawText = (cmd as any).raw || 'hello';
+    const reply = await askGroq(rawText, isPrivateMode);
+    setBusy(false);
+    push({ kind: 'output', text: reply });
     return true;
   }
 
   if (cmd.type === 'unknown') {
-    push({ kind: 'output', text: `I'm not quite sure what you mean by "${cmd.raw}". I'm a specialized payments agent, but you can type \`help\` to see what I can do!` });
+    setBusy(true);
+    const { askGroq } = await import('../llm');
+    const reply = await askGroq(cmd.raw, isPrivateMode);
+    setBusy(false);
+    push({ kind: 'output', text: reply });
     return true;
   }
 

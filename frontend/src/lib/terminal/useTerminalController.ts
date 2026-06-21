@@ -300,6 +300,19 @@ export function useTerminalController(options: UseTerminalOptions = {}) {
       if (!raw.trim()) return;
 
       if (step) {
+        if (step.flow === 'confirm-send') {
+          push({ kind: 'input', text: raw });
+          const input = raw.toLowerCase().trim();
+          if (input === 'y' || input === 'yes') {
+            await confirmSendTransaction();
+          } else if (input === 'n' || input === 'no') {
+            cancelSendTransaction();
+          } else {
+            push({ kind: 'error', text: 'please type "y" to confirm or "n" to cancel.' });
+          }
+          return;
+        }
+
         await handleStepInput({
           raw,
           step,

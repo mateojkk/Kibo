@@ -1,3 +1,4 @@
+import os
 import uuid
 import hashlib
 import hmac
@@ -799,3 +800,43 @@ def claim_private_transfer(transfer_id: str, user: dict = Depends(get_current_us
     if not res.data:
         raise HTTPException(status_code=404, detail="transfer not found or already claimed")
     return res.data[0]
+
+
+class LLMRequest(BaseModel):
+    message: str
+    isPrivateMode: bool
+
+@router.post("/llm")
+def process_llm_request(req: LLMRequest):
+    groq_api_key = os.environ.get("GROQ_API_KEY")
+    if not groq_api_key:
+        return {"reply": "i'm a bit busy right now... (backend missing groq api key)"}
+
+    import requests as reqs
+    headers = {
+        "Authorization": f"Bearer {groq_api_key}",
+        "Content-Type": "application/json"
+    }
+    mode_text = "Private (Shielded Pool)" if req.isPrivateMode else "Public (Standard)"
+    payload = {
+        "model": "llama3-8b-8192",
+        "messages": [
+            {
+                "role": "system",
+                "content": f"You are the Kibo Agent, a cool, fast, conversational crypto payments assistant built on the Sui blockchain.\nYour current mode is: {mode_text}.\nKeep your answers brief, cool, entirely in lowercase, and extremely conversational. Do not use formatting. Max 2 sentences."
+            },
+            {
+                "role": "user",
+                "content": req.message
+            }
+        ]
+    }
+
+    try:
+        resp = reqs.post("https://api.groq.com/openai/v1/chat/completions", json=payload, headers=headers, timeout=5)
+        resp.raise_for_status()
+        data = resp.json()
+        return {"reply": data["choices"][0]["message"]["content"]}
+    except Exception as e:
+        print(f"Groq API error: {e}")
+        return {"reply": "i couldn't reach my brain right now... try typing `help`!"}
