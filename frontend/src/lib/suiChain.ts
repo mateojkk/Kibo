@@ -19,7 +19,7 @@ export const SUI_STABLECOINS: CoinMetadata[] = [
   {
     symbol: 'USDC',
     name: 'USD Coin',
-    address: '0xa1ecbeb50f704fa4b0559f972b20f187a55255476d0d210515155df987d6cf62::usdc::USDC',
+    address: '0xa1ec7fc00a6f40db9693ad1415d0c193ad3906494428cf252621037bd7117e29::usdc::USDC',
     decimals: 6,
   },
   {

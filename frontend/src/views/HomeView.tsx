@@ -35,7 +35,6 @@ interface HomeViewProps {
   balanceLoading: boolean;
   assets: AssetBalance[];
   onRefresh: () => void;
-  onNavigateToTab?: (tab: 'home' | 'contacts' | 'chat' | 'settings' | 'transactions') => void;
 }
 
 export default function HomeView({
@@ -43,7 +42,6 @@ export default function HomeView({
   balanceLoading,
   assets,
   onRefresh,
-  onNavigateToTab,
 }: HomeViewProps) {
   const BALANCE_VISIBILITY_KEY = 'kibo_balance_visible';
   const [balanceVisible, setBalanceVisible] = useState<boolean>(() => {
@@ -113,19 +111,7 @@ export default function HomeView({
         </div>
       </div>
 
-      {/* Quick actions */}
-      <div className={homeStyles['action-row']}>
-        <button
-          className={`${homeStyles['action-btn']} ${homeStyles.primary}`}
-          onClick={() => onNavigateToTab?.('chat')}
-        >
-          <svg viewBox="0 0 24 24">
-            <polyline points="4 17 10 11 4 5"/>
-            <line x1="12" y1="19" x2="20" y2="19"/>
-          </svg>
-          Chat Command Line
-        </button>
-      </div>
+
 
       {/* Assets list */}
       <div className={homeStyles['asset-section']}>

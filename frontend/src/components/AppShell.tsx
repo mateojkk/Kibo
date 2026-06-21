@@ -93,7 +93,6 @@ export default function AppShell({
             balanceLoading={balanceLoading}
             assets={assets}
             onRefresh={onRefreshBalance}
-            onNavigateToTab={(tab) => setActiveTab(tab)}
           />
         )}
         {activeTab === 'transactions' && (
