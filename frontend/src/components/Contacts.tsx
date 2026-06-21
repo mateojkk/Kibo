@@ -92,9 +92,14 @@ export default function Contacts({ onSelect }: { onSelect?: (contact: Contact) =
   return (
     <div className={styles['animate-fade-in']} style={{ width: '100%', maxWidth: '800px', margin: '0 auto' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
-        <h2 style={{ fontSize: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-          <User size={24} /> Address Book
-        </h2>
+        <div>
+          <h2 style={{ fontSize: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+            <User size={24} /> Address Book
+          </h2>
+          <p style={{ color: 'var(--fg-secondary)', fontSize: '0.9rem', marginTop: '0.4rem', marginLeft: '2.25rem' }}>
+            Save people once and send by name later.
+          </p>
+        </div>
         <button className={styles['primary-button']} onClick={() => setShowAdd(!showAdd)}>
           <Plus size={20} /> {showAdd ? 'Cancel' : 'Add Contact'}
         </button>
