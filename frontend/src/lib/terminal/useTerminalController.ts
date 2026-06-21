@@ -117,7 +117,7 @@ export function useTerminalController(options: UseTerminalOptions = {}) {
         }
 
         // Public Direct Gasless stablecoin transfer
-        push({ kind: 'info', text: `preparing public transfer of ${displaySymbol}${amount} → @${recipient.label}...` });
+        push({ kind: 'info', text: `preparing public transfer of ${displaySymbol}${amount} → ${recipient.label}...` });
         
         const tx = new Transaction();
 
@@ -188,7 +188,7 @@ export function useTerminalController(options: UseTerminalOptions = {}) {
             txHash: digest,
             amount: amount,
             to: recipient.address,
-            label: `@${recipient.label} (Public)`,
+            label: `${recipient.label} (Public)`,
           });
 
           push(

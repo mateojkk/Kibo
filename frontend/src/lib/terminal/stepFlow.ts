@@ -59,7 +59,7 @@ export async function handleStepInput({
         const wallet = await loginWithGoogle(generateMockGoogleJwt(step.email), username);
         setWallet(wallet);
         push(
-          { kind: 'success', text: `✓ wallet created for @${wallet.username}` },
+          { kind: 'success', text: `✓ wallet created for ${wallet.username}` },
           { kind: 'output', text: `  address: ${wallet.address}` },
           { kind: 'info', text: '  use Kibo privately or publicly gaslessly!' },
           { kind: 'separator' }
@@ -86,7 +86,7 @@ export async function handleStepInput({
       try {
         const wallet = await loginWithGoogle(generateMockGoogleJwt(email));
         setWallet(wallet);
-        push({ kind: 'success', text: `✓ welcome back, @${wallet.username}` });
+        push({ kind: 'success', text: `✓ welcome back, ${wallet.username}` });
         push({ kind: 'output', text: `  address: ${wallet.address}` });
       } catch (e: any) {
         push({ kind: 'error', text: `login failed: ${e.response?.data?.detail || e.message}` });

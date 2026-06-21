@@ -74,12 +74,12 @@ export default function AppShell({
           {wallet.pfp ? (
             <>
               <img src={wallet.pfp} className={styles['user-pfp']} alt="" />
-              <span className={styles['user-badge-text']}>@{wallet.username}</span>
+              <span className={styles['user-badge-text']}>{wallet.username}</span>
             </>
           ) : (
             <>
               <div className={styles['user-pfp-fallback']}>{wallet.username.charAt(0).toUpperCase()}</div>
-              <span className={styles['user-badge-text']}>@{wallet.username} · {shortAddr}</span>
+              <span className={styles['user-badge-text']}>{wallet.username} · {shortAddr}</span>
             </>
           )}
         </div>

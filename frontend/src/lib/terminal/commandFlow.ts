@@ -40,7 +40,7 @@ export async function handleCommand(
 
   if (cmd.type === 'create') {
     if (wallet) {
-      push({ kind: 'info', text: `already connected: @${wallet.username} · ${wallet.address}` });
+      push({ kind: 'info', text: `already connected: ${wallet.username} · ${wallet.address}` });
       return true;
     }
     push({ kind: 'info', text: 'creating a new Kibo wallet. enter email:' });
@@ -50,17 +50,17 @@ export async function handleCommand(
 
   if (cmd.type === 'login') {
     if (wallet) {
-      push({ kind: 'info', text: `already connected: @${wallet.username} · ${wallet.address}` });
+      push({ kind: 'info', text: `already connected: ${wallet.username} · ${wallet.address}` });
       return true;
     }
     const lastUser = getPersistedUsername();
     if (lastUser && lastUser.includes('@')) {
       setBusy(true);
-      push({ kind: 'info', text: `reconnecting @${lastUser}... fetching salt...` });
+      push({ kind: 'info', text: `reconnecting ${lastUser.replace(/^@/, '')}... fetching salt...` });
       try {
         const restoredWallet = await loginWithGoogle(generateMockGoogleJwt(lastUser));
         setWallet(restoredWallet);
-        push({ kind: 'success', text: `✓ welcome back, @${restoredWallet.username}` });
+        push({ kind: 'success', text: `✓ welcome back, ${restoredWallet.username}` });
         push({ kind: 'output', text: `  address: ${restoredWallet.address}` });
       } catch (e: any) {
         push({ kind: 'error', text: `reconnect failed: ${e.message}. enter email:` });
@@ -125,7 +125,7 @@ export async function handleCommand(
       const displaySymbol = token.symbol === 'USDC' ? '$' : token.symbol;
       push({ 
         kind: 'output', 
-        text: `Are you sure you want to send ${displaySymbol}${cmd.amount} to @${contactName}? \nType 'y' to confirm or 'n' to cancel.` 
+        text: `Are you sure you want to send ${displaySymbol}${cmd.amount} to ${contactName}? \nType 'y' to confirm or 'n' to cancel.` 
       });
       setStep({
         flow: 'confirm-send',

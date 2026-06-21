@@ -252,8 +252,8 @@ def zklogin_session(req: ZkLoginSessionRequest, request: Request):
     if requested_username:
         if len(requested_username) < 3 or len(requested_username) > 30:
             raise HTTPException(status_code=400, detail="Your username must be between 3 and 30 characters.")
-        if not re.match(r"^[a-zA-Z0-9_]+$", requested_username):
-            raise HTTPException(status_code=400, detail="Your username can only contain letters, numbers, and underscores.")
+        if not re.match(r"^[a-zA-Z0-9_\.]+$", requested_username):
+            raise HTTPException(status_code=400, detail="Your username can only contain letters, numbers, underscores, and dots.")
         existing_username_res = supabase.table("users").select("*").eq("username", requested_username).limit(1).execute()
         existing_username = existing_username_res.data[0] if existing_username_res.data else None
         if existing_username and (not user or existing_username["id"] != user["id"]):
@@ -671,8 +671,8 @@ def update_profile(req: UpdateProfileRequest, user: dict = Depends(get_current_u
         requested_username = normalize_username(req.username)
         if len(requested_username) < 3 or len(requested_username) > 30:
             raise HTTPException(status_code=400, detail="Your username must be between 3 and 30 characters.")
-        if not re.match(r"^[a-zA-Z0-9_]+$", requested_username):
-            raise HTTPException(status_code=400, detail="Your username can only contain letters, numbers, and underscores.")
+        if not re.match(r"^[a-zA-Z0-9_\.]+$", requested_username):
+            raise HTTPException(status_code=400, detail="Your username can only contain letters, numbers, underscores, and dots.")
         existing_username_res = supabase.table("users").select("*").eq("username", requested_username).limit(1).execute()
         existing_username = existing_username_res.data[0] if existing_username_res.data else None
         if existing_username and existing_username["id"] != user["id"]:
