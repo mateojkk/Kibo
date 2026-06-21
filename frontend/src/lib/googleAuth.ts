@@ -46,29 +46,6 @@ export function initGoogleAuth(clientId: string): void {
   waitForGis();
 }
 
-export function renderGoogleButton(element: HTMLElement, clientId: string, onCredential: (credential: string) => void): void {
-  const waitForGis = () => {
-    if (!window.google?.accounts?.id) {
-      setTimeout(waitForGis, 200);
-      return;
-    }
-    window.google.accounts.id.initialize({
-      client_id: clientId,
-      callback: (response) => {
-        if (response.credential) onCredential(response.credential);
-      },
-      cancel_on_tap_outside: false,
-    });
-    window.google.accounts.id.renderButton(element, { 
-      theme: "outline", 
-      size: "large", 
-      shape: "rectangular", 
-      text: "continue_with" 
-    });
-  };
-  waitForGis();
-}
-
 export function triggerGoogleSignIn(onCredential: (credential: string) => void): void {
   pendingCallback = onCredential;
   if (window.google?.accounts?.id) {
