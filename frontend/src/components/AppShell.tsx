@@ -5,12 +5,13 @@ import type { AssetBalance } from '../hooks/useAppState';
 import HomeView from '../views/HomeView';
 import ContactsView from '../views/ContactsView';
 import SettingsView from '../views/SettingsView';
-import TransactionsView from '../views/TransactionsView';
 import Terminal from './Terminal';
 import styles from '../styles/appShell.module.css';
 
-type Tab = 'home' | 'contacts' | 'chat' | 'settings' | 'transactions';
+type Tab = 'home' | 'contacts' | 'chat' | 'settings';
 const ACTIVE_TAB_KEY = 'kibo_active_tab';
+
+
 
 interface AppShellProps {
   wallet: AgentWallet;
@@ -95,9 +96,6 @@ export default function AppShell({
             onRefresh={onRefreshBalance}
           />
         )}
-        {activeTab === 'transactions' && (
-          <TransactionsView wallet={wallet} />
-        )}
         {activeTab === 'contacts' && (
           <ContactsView
             contacts={contacts}
@@ -140,18 +138,7 @@ export default function AppShell({
             </svg>
           }
         />
-        <TabItem
-          id="transactions"
-          label="History"
-          active={activeTab === 'transactions'}
-          onClick={() => setActiveTab('transactions')}
-          icon={
-            <svg className={styles['tab-icon']} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <circle cx="12" cy="12" r="10"/>
-              <polyline points="12 6 12 12 16 14"/>
-            </svg>
-          }
-        />
+
         <TabItem
           id="contacts"
           label="Address Book"

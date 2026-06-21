@@ -149,7 +149,7 @@ export async function handleCommand(
     push({
       kind: 'link',
       text: '  view on explorer ↗',
-      href: `https://suiscan.xyz/testnet/account/${wallet.address}`,
+      href: `https://testnet.suivision.xyz/account/${wallet.address}`,
     });
     return true;
   }

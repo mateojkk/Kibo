@@ -2,32 +2,9 @@ import { useEffect, useState } from 'react';
 import type { AgentWallet, AssetBalance } from '../hooks/useAppState';
 
 import homeStyles from '../styles/home.module.css';
+import TransactionsView from './TransactionsView';
 
-function TokenIcon({ symbol }: { symbol: string }) {
-  if (symbol === 'USDC') {
-    return <img src="https://cryptologos.cc/logos/usd-coin-usdc-logo.png" alt="USDC" className={homeStyles['asset-icon-fallback']} style={{ background: 'transparent', padding: '0', border: 'none' }} />;
-  }
-  
-  if (symbol === 'USDsui') {
-    return (
-      <div className={homeStyles['asset-icon-fallback']} style={{ background: '#0b0a0a', border: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4c8cf5" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
-        </svg>
-      </div>
-    );
-  }
 
-  // Fallback for any other unexpected tokens
-  return (
-    <div 
-      className={homeStyles['asset-icon-fallback']}
-      style={{ background: 'linear-gradient(135deg, #4b5563, #9ca3af)', color: '#fff', fontWeight: 'bold', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-    >
-      {symbol.charAt(0)}
-    </div>
-  );
-}
 
 interface HomeViewProps {
   wallet: AgentWallet;
@@ -38,9 +15,9 @@ interface HomeViewProps {
 }
 
 export default function HomeView({
+  wallet,
   balance,
   balanceLoading,
-  assets,
   onRefresh,
 }: HomeViewProps) {
   const BALANCE_VISIBILITY_KEY = 'kibo_balance_visible';
@@ -113,39 +90,7 @@ export default function HomeView({
 
 
 
-      {/* Assets list */}
-      <div className={homeStyles['asset-section']}>
-        <div className={homeStyles['asset-title']}>Asset Accounts</div>
-        <div className={homeStyles['asset-list']}>
-          {assets.filter(a => ['USDC', 'USDsui'].includes(a.symbol)).map((asset) => {
-            return (
-              <div key={asset.address} className={homeStyles['asset-card']}>
-                <div className={homeStyles['asset-info']}>
-                  <TokenIcon symbol={asset.symbol} />
-                  <div className={homeStyles['asset-meta']}>
-                    <span className={homeStyles['asset-symbol']}>
-                      {asset.symbol === 'USDC' ? '$' : asset.symbol}
-                    </span>
-                    <span className={homeStyles['asset-name']}>
-                      {asset.symbol === 'USDC' ? 'Digital Dollar' : asset.name}
-                    </span>
-                  </div>
-                </div>
-                <div className={homeStyles['asset-balance-container']}>
-                  <div className={homeStyles['asset-balance']}>
-                    {balanceVisible ? asset.balance : '******'}
-                  </div>
-                  <div className={homeStyles['asset-value']}>
-                    {balanceVisible 
-                      ? `$${(parseFloat(asset.balance) * (asset.symbol === 'SUI' ? 1.25 : 1.0)).toFixed(2)}` 
-                      : '******'}
-                  </div>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </div>
+      <TransactionsView wallet={wallet} />
     </div>
   );
 }

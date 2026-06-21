@@ -20,10 +20,10 @@ export const SUI_STABLECOINS: CoinMetadata[] = [
 export const ALL_SUPPORTED_COINS = [...SUI_STABLECOINS];
 
 export const EXPLORER_TX = (digest: string) =>
-  `https://suiscan.xyz/testnet/tx/${digest}`;
+  `https://testnet.suivision.xyz/txblock/${digest}`;
 
 export const EXPLORER_ADDR = (addr: string) =>
-  `https://suiscan.xyz/testnet/account/${addr}`;
+  `https://testnet.suivision.xyz/account/${addr}`;
 
 // Deployed Kibo package and shared ShieldedPool object IDs
 export const KIBO_PACKAGE_ID = '0x5391d6f3dfef86a4c2140cb2c9f80cc0bc2fc8230509a25b17c2f6d2f3c0ce2f';
