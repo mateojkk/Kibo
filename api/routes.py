@@ -714,6 +714,22 @@ def contact_to_dict(doc: dict) -> dict:
     }
 
 
+@router.get("/user/{username}")
+def get_user_by_username(username: str):
+    supabase = get_supabase()
+    username = normalize_username(username)
+    if not username.endswith(".kibo"):
+        username += ".kibo"
+    res = supabase.table("users").select("id, username, wallet_address").eq("username", username).limit(1).execute()
+    if not res.data:
+        raise HTTPException(status_code=404, detail="User not found")
+    user = res.data[0]
+    return {
+        "username": user["username"],
+        "wallet_address": user.get("wallet_address") or ""
+    }
+
+
 @router.get("/contacts")
 def list_contacts(user: dict = Depends(get_current_user)):
     supabase = get_supabase()

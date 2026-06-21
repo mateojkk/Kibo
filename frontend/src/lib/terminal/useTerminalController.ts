@@ -79,6 +79,17 @@ export function useTerminalController(options: UseTerminalOptions = {}) {
       const shortAddr = `${cleaned.slice(0, 6)}...${cleaned.slice(-4)}`;
       return { address: cleaned, label: shortAddr };
     }
+    
+    // Resolve via Kibo username
+    try {
+      const res = await baseApi.get(`/user/${cleaned}`);
+      if (res.data && res.data.wallet_address) {
+        return { address: res.data.wallet_address, label: res.data.username };
+      }
+    } catch {
+      // Not found or error
+    }
+
     return null;
   };
 
