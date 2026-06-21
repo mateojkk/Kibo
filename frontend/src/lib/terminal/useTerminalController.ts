@@ -178,7 +178,7 @@ export function useTerminalController(options: UseTerminalOptions = {}) {
           
           // Merge remaining coin objects if multiple exist
           if (coinsData.data.length > 1) {
-            tx.mergeCoins(primaryCoin, coinsData.data.slice(1).map(c => tx.object(c.coinObjectId)));
+            tx.mergeCoins(primaryCoin, coinsData.data.slice(1).map((c: any) => tx.object(c.coinObjectId)));
           }
           const [splitCoin] = tx.splitCoins(primaryCoin, [tx.pure.u64(amountRaw)]);
           primaryCoinInput = splitCoin;
@@ -243,9 +243,14 @@ export function useTerminalController(options: UseTerminalOptions = {}) {
           tx.setGasBudget(0);
           tx.setGasPayment([]);
 
-          // FIX: Transactions without address-owned inputs MUST have an expiration epoch
-          const systemState = await suiClient.getLatestSuiSystemState();
-          tx.setExpiration({ Epoch: Number(systemState.epoch) + 1 });
+          // FIX: To bypass the ValidDuring requirement without upgrading the SDK to 2.x, 
+          // we add a 0-value address-owned input to the transaction block.
+          const coinsData = await suiClient.getCoins({ owner: wallet.address, coinType: token.address });
+          if (coinsData.data.length > 0) {
+            const primaryCoin = tx.object(coinsData.data[0].coinObjectId);
+            const [dummyCoin] = tx.splitCoins(primaryCoin, [tx.pure.u64(0)]);
+            tx.transferObjects([dummyCoin], tx.pure.address(wallet.address));
+          }
 
           push({ kind: 'info', text: `submitting public transaction...` });
           

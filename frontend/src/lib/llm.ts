@@ -6,6 +6,7 @@ export async function askGroq(message: string, isPrivateMode: boolean): Promise<
     return response.data.reply;
   } catch (error: any) {
     console.error("LLM Backend error:", error);
-    return "i couldn't reach my brain right now... try typing `help`!";
+    const backendError = error.response?.data?.detail || error.message || "Unknown error";
+    return `i couldn't reach my brain right now... (Error: ${backendError})`;
   }
 }
