@@ -138,12 +138,7 @@ export function useTerminalController(options: UseTerminalOptions = {}) {
         
         const primaryCoin = tx.object(coinsData.data[0].coinObjectId);
         
-        // 2. Merge remaining coins if multiple exist
-        if (coinsData.data.length > 1) {
-          tx.mergeCoins(primaryCoin, coinsData.data.slice(1).map((c: any) => tx.object(c.coinObjectId)));
-        }
-        
-        // 3. Extract balance from coin (required for gasless stablecoin transfers)
+        // 2. Extract balance from coin (required for gasless stablecoin transfers)
         const balance = tx.moveCall({
           target: '0x2::coin::into_balance',
           typeArguments: [token.address],
@@ -174,10 +169,6 @@ export function useTerminalController(options: UseTerminalOptions = {}) {
           tx.setGasBudget(0);
           tx.setGasPayment([]);
           
-          // FIX: To bypass the ValidDuring requirement without upgrading the SDK to 2.x,
-          // we add a 0-value address-owned input to the transaction block.
-          const [dummyCoin] = tx.splitCoins(primaryCoin, [tx.pure.u64(0)]);
-          tx.transferObjects([dummyCoin], tx.pure.address(wallet.address));
           push({ kind: 'info', text: `submitting public transaction...` });
           
           if (!wallet.keypair) throw new Error('Wallet missing keypair');
