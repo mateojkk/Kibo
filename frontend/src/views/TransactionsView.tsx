@@ -96,22 +96,24 @@ export default function TransactionsView({ wallet }: TransactionsViewProps) {
       ) : (
         <div className={homeStyles['activity-list']}>
           {activity.map((item) => (
-            <div className={homeStyles['activity-item']} key={item.id}>
+            <a 
+              className={homeStyles['activity-item']} 
+              key={item.id}
+              href={EXPLORER_TX(item.txHash)}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ textDecoration: 'none', color: 'inherit', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+            >
               <div>
                 <div className={homeStyles['activity-amount']}>{item.amount} USDC</div>
                 <div className={homeStyles['activity-meta']}>
                   {item.direction === 'in' ? 'from' : 'to'} {formatTxLabel(item.label, item.from, item.to, item.direction)} · {new Date(item.createdAt).toLocaleString()}
                 </div>
               </div>
-              <a
-                className={homeStyles['activity-link']}
-                href={EXPLORER_TX(item.txHash)}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
+              <div className={homeStyles['activity-link']}>
                 View ↗
-              </a>
-            </div>
+              </div>
+            </a>
           ))}
         </div>
       )}
