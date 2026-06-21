@@ -32,7 +32,7 @@ export async function handleCommand(
       { kind: 'separator' },
       { kind: 'info', text: '  KIBO PAYMENTS MENU' },
       { kind: 'separator' },
-      { kind: 'output', text: '    send <amount> to <address>   send funds instantly via shielded pool' },
+      { kind: 'output', text: '    send <amount> to <address>   send funds instantly' },
       { kind: 'separator' },
     );
     return true;

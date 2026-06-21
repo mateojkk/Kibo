@@ -160,7 +160,7 @@ export default function AppShell({
           onClick={handleRequestFaucet}
           icon={
             <svg className={styles['tab-icon']} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M12 2v14m-7-7 7 7 7-7"/><path d="M5 21h14"/>
+              <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/>
             </svg>
           }
         />

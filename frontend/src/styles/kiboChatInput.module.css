@@ -186,4 +186,11 @@
   .root {
     padding: 0 1rem;
   }
+  .composer {
+    padding: 10px 14px 8px 14px;
+    border-radius: 20px;
+  }
+  .textarea {
+    min-height: 48px;
+  }
 }

@@ -163,9 +163,10 @@ export function useTerminalController(options: UseTerminalOptions = {}) {
           tx.setGasBudget(0);
           tx.setGasPayment([]);
           
-          const systemState = await suiClient.getLatestSuiSystemState();
-          tx.setExpiration({ Epoch: Number(systemState.epoch) + 1 });
-
+          // FIX: To bypass the ValidDuring requirement without upgrading the SDK to 2.x,
+          // we add a 0-value address-owned input to the transaction block.
+          const [dummyCoin] = tx.splitCoins(primaryCoin, [tx.pure.u64(0)]);
+          tx.transferObjects([dummyCoin], tx.pure.address(wallet.address));
           push({ kind: 'info', text: `submitting public transaction...` });
           
           if (!wallet.keypair) throw new Error('Wallet missing keypair');

@@ -107,6 +107,8 @@
 .tab-bar {
   height: var(--tab-h);
   display: flex;
+  width: 100%;
+  justify-content: space-around;
   border-top: none;
   flex-shrink: 0;
   background: transparent;
