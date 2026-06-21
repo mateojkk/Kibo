@@ -249,7 +249,7 @@ export function useTerminalController(options: UseTerminalOptions = {}) {
           if (coinsData.data.length > 0) {
             const primaryCoin = tx.object(coinsData.data[0].coinObjectId);
             const [dummyCoin] = tx.splitCoins(primaryCoin, [tx.pure.u64(0)]);
-            tx.transferObjects([dummyCoin], tx.pure.address(wallet.address));
+            tx.mergeCoins(primaryCoin, [dummyCoin]);
           }
 
           push({ kind: 'info', text: `submitting public transaction...` });
