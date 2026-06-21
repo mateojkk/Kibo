@@ -312,7 +312,7 @@ def zklogin_session(req: ZkLoginSessionRequest, request: Request):
         "username": username,
         "email": user.get("email", ""),
         "walletAddress": user.get("wallet_address", ""),
-        "pfp": user.get("pfp", ""),
+        "pfp": user.get("password_hash", ""),
     }
 
 
@@ -657,7 +657,7 @@ def get_me(user: dict = Depends(get_current_user)):
         "username": user.get("username", ""),
         "email": user.get("email", ""),
         "walletAddress": user.get("wallet_address", ""),
-        "pfp": user.get("pfp", ""),
+        "pfp": user.get("password_hash", ""),
     }
 
 
@@ -697,7 +697,7 @@ def update_profile(req: UpdateProfileRequest, user: dict = Depends(get_current_u
         updates["username"] = requested_username
 
     if req.pfp is not None:
-        updates["pfp"] = req.pfp
+        updates["password_hash"] = req.pfp
 
     if updates:
         updates["updated_at"] = now_iso()
