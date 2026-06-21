@@ -107,7 +107,7 @@ export default function AppShell({
         )}
         {activeTab === 'chat' && (
           <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-            <Terminal wallet={wallet} onWalletChange={onWalletChange} />
+            <Terminal wallet={wallet} onWalletChange={onWalletChange} refreshBalance={onRefreshBalance} />
           </div>
         )}
         {activeTab === 'settings' && (

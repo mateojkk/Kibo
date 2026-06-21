@@ -16,6 +16,7 @@ import { encryptMetadata } from '../crypto';
 type UseTerminalOptions = {
   wallet?: AgentWallet | null;
   onWalletChange?: (wallet: AgentWallet | null) => void;
+  onTransactionSuccess?: () => void;
 };
 
 export function useTerminalController(options: UseTerminalOptions = {}) {
@@ -225,32 +226,31 @@ export function useTerminalController(options: UseTerminalOptions = {}) {
           
           const tx = new Transaction();
 
-          // Protocol-level gasless transfer using Native Address Balances
-          // @ts-ignore
-          const balanceInput = typeof tx.balance === 'function' ? tx.balance({ balance: amountRaw }) : tx.pure.u64(amountRaw);
+          // 1. Get user's coins
+          const coinsData = await suiClient.getCoins({ owner: wallet.address, coinType: token.address });
+          if (coinsData.data.length === 0) throw new Error(`No ${token.symbol} coins found in wallet.`);
           
+          const primaryCoin = tx.object(coinsData.data[0].coinObjectId);
+          
+          // 2. Merge remaining coins if multiple exist
+          if (coinsData.data.length > 1) {
+            tx.mergeCoins(primaryCoin, coinsData.data.slice(1).map((c: any) => tx.object(c.coinObjectId)));
+          }
+          
+          // 3. Split the transfer amount
+          const [splitCoin] = tx.splitCoins(primaryCoin, [tx.pure.u64(amountRaw)]);
+          
+          // 4. Send via MoveCall to public_transfer (TransferObjects is not allowed in gasless)
           tx.moveCall({
-            target: '0x2::balance::send_funds',
-            typeArguments: [token.address],
-            arguments: [
-              balanceInput,
-              tx.pure.address(recipient.address)
-            ]
+            target: '0x2::transfer::public_transfer',
+            typeArguments: [`0x2::coin::Coin<${token.address}>`],
+            arguments: [splitCoin, tx.pure.address(recipient.address)]
           });
           
           // Native protocol-level gasless exemption
           tx.setGasPrice(0);
           tx.setGasBudget(0);
           tx.setGasPayment([]);
-
-          // FIX: To bypass the ValidDuring requirement without upgrading the SDK to 2.x, 
-          // we add a 0-value address-owned input to the transaction block.
-          const coinsData = await suiClient.getCoins({ owner: wallet.address, coinType: token.address });
-          if (coinsData.data.length > 0) {
-            const primaryCoin = tx.object(coinsData.data[0].coinObjectId);
-            const [dummyCoin] = tx.splitCoins(primaryCoin, [tx.pure.u64(0)]);
-            tx.mergeCoins(primaryCoin, [dummyCoin]);
-          }
 
           push({ kind: 'info', text: `submitting public transaction...` });
           
@@ -262,6 +262,11 @@ export function useTerminalController(options: UseTerminalOptions = {}) {
             transaction: tx,
             options: { showEffects: true }
           });
+          
+          if (result.effects?.status?.status !== 'success') {
+            throw new Error(`Transaction failed on-chain: ${result.effects?.status?.error || 'Unknown error'}`);
+          }
+          
           const digest = result.digest;
 
           await baseApi.post('/activity', {
@@ -275,6 +280,10 @@ export function useTerminalController(options: UseTerminalOptions = {}) {
             { kind: 'success', text: `✓ Public transfer of ${amount} ${token.symbol} successful!` },
             { kind: 'link', text: `  explorer ↗`, href: EXPLORER_TX(digest) }
           );
+          
+          if (options.onTransactionSuccess) {
+            options.onTransactionSuccess();
+          }
         }
         return true;
       } catch (e: any) {

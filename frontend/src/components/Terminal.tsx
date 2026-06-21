@@ -12,9 +12,10 @@ import type { AgentWallet } from '../lib/wallet';
 type TerminalProps = {
   wallet?: AgentWallet | null;
   onWalletChange?: (wallet: AgentWallet | null) => void;
+  refreshBalance?: () => void;
 };
 
-export default function Terminal({ wallet: externalWallet, onWalletChange }: TerminalProps) {
+export default function Terminal({ wallet: externalWallet, onWalletChange, refreshBalance }: TerminalProps) {
   const bottomRef = useRef<HTMLDivElement>(null);
   const {
     lines,
@@ -24,7 +25,7 @@ export default function Terminal({ wallet: externalWallet, onWalletChange }: Ter
     isPrivateMode,
     setIsPrivateMode,
     handleSubmit,
-  } = useTerminalController({ wallet: externalWallet, onWalletChange });
+  } = useTerminalController({ wallet: externalWallet, onWalletChange, onTransactionSuccess: refreshBalance });
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
