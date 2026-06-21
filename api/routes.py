@@ -826,7 +826,7 @@ def process_llm_request(req: LLMRequest):
     }
     mode_text = "Private (Shielded Pool)" if req.isPrivateMode else "Public (Standard)"
     payload = {
-        "model": "llama3-8b-8192",
+        "model": "llama-3.1-8b-instant",
         "messages": [
             {
                 "role": "system",
@@ -845,5 +845,11 @@ def process_llm_request(req: LLMRequest):
         data = resp.json()
         return {"reply": data["choices"][0]["message"]["content"]}
     except Exception as e:
-        print(f"Groq API error: {e}")
-        return {"reply": f"Groq API Error: {str(e)}"}
+        error_details = ""
+        if hasattr(e, 'response') and e.response is not None:
+            try:
+                error_details = e.response.text
+            except:
+                pass
+        print(f"Groq API error: {e} | Details: {error_details}")
+        return {"reply": f"Groq API Error: {str(e)} | {error_details}"}
