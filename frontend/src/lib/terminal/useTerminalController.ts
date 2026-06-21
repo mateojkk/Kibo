@@ -50,23 +50,7 @@ export function useTerminalController(options: UseTerminalOptions = {}) {
     }
   }, [wallet?.address, wallet?.username, onWalletChange]);
 
-  useEffect(() => {
-    const saved = sessionStorage.getItem('kibo_lines');
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        setLines(parsed);
-      } catch {
-        /* ignore */
-      }
-    }
-  }, []);
 
-  useEffect(() => {
-    if (lines.length > BOOT_LINES.length) {
-      sessionStorage.setItem('kibo_lines', JSON.stringify(lines.slice(-100)));
-    }
-  }, [lines]);
 
   useEffect(() => {
     if (!wallet?.address) return;
