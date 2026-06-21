@@ -152,13 +152,12 @@ export function useTerminalController(options: UseTerminalOptions = {}) {
           arguments: [splitBalance, tx.pure.address(recipient.address)]
         });
         
-        // 6. Return remaining balance to coin and send back to sender
-        const remainingCoin = tx.moveCall({
-          target: '0x2::coin::from_balance',
+        // 6. Return remaining balance back to sender (gasless compatible)
+        tx.moveCall({
+          target: '0x2::balance::send_funds',
           typeArguments: [token.address],
-          arguments: [balance]
+          arguments: [balance, tx.pure.address(wallet.address)]
         });
-        tx.transferObjects([remainingCoin], tx.pure.address(wallet.address));
           tx.setGasPrice(0);
           tx.setGasBudget(0);
           tx.setGasPayment([]);
