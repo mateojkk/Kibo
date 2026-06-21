@@ -138,38 +138,36 @@ export function useTerminalController(options: UseTerminalOptions = {}) {
         
         const primaryCoin = tx.object(coinsData.data[0].coinObjectId);
         
-        // 2. Extract balance from coin (required for gasless stablecoin transfers)
+        // 2. Merge remaining coins if multiple exist
+        if (coinsData.data.length > 1) {
+          tx.mergeCoins(primaryCoin, coinsData.data.slice(1).map((c: any) => tx.object(c.coinObjectId)));
+        }
+        
+        // 3. Split exactly the amount we need from the primary coin
+        const [splitCoin] = tx.splitCoins(primaryCoin, [tx.pure.u64(amountRaw)]);
+        
+        // 4. Convert only the split amount into a balance (required for gasless stablecoin transfers)
         const balance = tx.moveCall({
           target: '0x2::coin::into_balance',
           typeArguments: [token.address],
-          arguments: [primaryCoin],
-        });
-        
-        // 4. Split the balance
-        const splitBalance = tx.moveCall({
-          target: '0x2::balance::split',
-          typeArguments: [token.address],
-          arguments: [balance, tx.pure.u64(amountRaw)],
+          arguments: [splitCoin],
         });
 
-        // 5. Send via send_funds (this is the supported gasless method)
+        // 5. Send via send_funds (this updates the recipient's Address Balance gaslessly)
         tx.moveCall({
           target: '0x2::balance::send_funds',
           typeArguments: [token.address],
-          arguments: [splitBalance, tx.pure.address(recipient.address)]
+          arguments: [balance, tx.pure.address(recipient.address)]
         });
+
+        tx.setGasPrice(0);
+        tx.setGasBudget(0);
+        tx.setGasPayment([]);
         
-        // 6. Return remaining balance back to sender (gasless compatible)
-        tx.moveCall({
-          target: '0x2::balance::send_funds',
-          typeArguments: [token.address],
-          arguments: [balance, tx.pure.address(wallet.address)]
-        });
-          tx.setGasPrice(0);
-          tx.setGasBudget(0);
-          tx.setGasPayment([]);
+        const systemState = await suiClient.getLatestSuiSystemState();
+        tx.setExpiration({ Epoch: Number(systemState.epoch) + 1 });
           
-          push({ kind: 'info', text: `submitting public transaction...` });
+        push({ kind: 'info', text: `submitting native gasless transaction...` });
           
           if (!wallet.keypair) throw new Error('Wallet missing keypair');
           tx.setSender(wallet.address);
