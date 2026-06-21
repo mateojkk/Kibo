@@ -7,13 +7,6 @@ export interface CoinMetadata {
   decimals: number;
 }
 
-export const SUI_COIN: CoinMetadata = {
-  symbol: 'SUI',
-  name: 'Sui Native Token',
-  address: '0x2::sui::SUI',
-  decimals: 9,
-};
-
 // Whitelisted stablecoins supported for gasless transfers on Sui Testnet
 export const SUI_STABLECOINS: CoinMetadata[] = [
   {
@@ -48,7 +41,7 @@ export const SUI_STABLECOINS: CoinMetadata[] = [
   }
 ];
 
-export const ALL_SUPPORTED_COINS = [SUI_COIN, ...SUI_STABLECOINS];
+export const ALL_SUPPORTED_COINS = [...SUI_STABLECOINS];
 
 export const EXPLORER_TX = (digest: string) =>
   `https://suiscan.xyz/testnet/tx/${digest}`;

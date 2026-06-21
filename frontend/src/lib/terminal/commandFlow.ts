@@ -3,7 +3,7 @@ import type { AgentWallet } from '../wallet';
 import { getPersistedUsername, suiClient, loginWithGoogle, generateMockGoogleJwt } from '../wallet';
 import { getContacts, findContact } from '../contacts';
 
-import { SUI_STABLECOINS, SUI_COIN } from '../suiChain';
+import { SUI_STABLECOINS } from '../suiChain';
 import type { Command } from '../commandParser';
 import type { Step } from './types';
 
@@ -100,7 +100,7 @@ export async function handleCommand(
       if (cmd.tokenSymbol) {
         const token = SUI_STABLECOINS.find(
           (t) => t.symbol.toLowerCase() === cmd.tokenSymbol?.toLowerCase()
-        ) || (cmd.tokenSymbol.toUpperCase() === 'SUI' ? SUI_COIN : null);
+        );
         
         if (!token) {
           push({ kind: 'error', text: `token not supported: "${cmd.tokenSymbol}"` });
@@ -113,7 +113,7 @@ export async function handleCommand(
         push({ kind: 'success', text: `balance: ${formatted} ${token.symbol}` });
       } else {
         const balances = await Promise.all(
-          [SUI_COIN, ...SUI_STABLECOINS].map(async (token) => {
+          SUI_STABLECOINS.map(async (token) => {
             try {
               const rawBal = await suiClient.getBalance({ owner: wallet.address, coinType: token.address });
               const formatted = (Number(rawBal.totalBalance) / Math.pow(10, token.decimals)).toFixed(4);
@@ -139,7 +139,7 @@ export async function handleCommand(
     const tokenSymbol = cmd.tokenSymbol || 'USDC';
     const token = SUI_STABLECOINS.find(
       (t) => t.symbol.toLowerCase() === tokenSymbol.toLowerCase()
-    ) || (tokenSymbol.toUpperCase() === 'SUI' ? SUI_COIN : null);
+    );
     
     if (!token) {
       push({ kind: 'error', text: `token not supported: "${cmd.tokenSymbol}"` });

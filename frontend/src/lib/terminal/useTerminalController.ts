@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { BOOT_LINES } from './constants';
-import { SUI_STABLECOINS, SUI_COIN, KIBO_PACKAGE_ID, SHIELDED_POOL_ID, EXPLORER_TX } from '../suiChain';
+import { SUI_STABLECOINS, KIBO_PACKAGE_ID, SHIELDED_POOL_ID, EXPLORER_TX } from '../suiChain';
 import type { OutputLine } from '../../components/TerminalOutput';
 import { parseCommand } from '../commandParser';
 import { getContacts, findContact } from '../contacts';
@@ -114,7 +114,11 @@ export function useTerminalController(options: UseTerminalOptions = {}) {
       }
 
       const sym = tokenSymbol || 'USDC';
-      const token = SUI_STABLECOINS.find(t => t.symbol.toLowerCase() === sym.toLowerCase()) || SUI_COIN;
+      const token = SUI_STABLECOINS.find(t => t.symbol.toLowerCase() === sym.toLowerCase());
+      if (!token) {
+        push({ kind: 'error', text: `token not supported: "${sym}"` });
+        return false;
+      }
       
       const amountRaw = BigInt(Math.floor(amount * Math.pow(10, token.decimals)));
       
@@ -237,29 +241,24 @@ export function useTerminalController(options: UseTerminalOptions = {}) {
           
           const tx = new Transaction();
 
-          if (token.address === '0x2::sui::SUI') {
-            const [sCoin] = tx.splitCoins(tx.gas, [tx.pure.u64(amountRaw)]);
-            tx.transferObjects([sCoin], recipient.address);
-          } else {
-            // Protocol-level gasless transfer using Native Address Balances
-            // We use ts-ignore just in case the installed SDK version doesn't have the types for tx.balance yet
-            // @ts-ignore
-            const balanceInput = typeof tx.balance === 'function' ? tx.balance({ balance: amountRaw }) : tx.pure.u64(amountRaw);
-            
-            tx.moveCall({
-              target: '0x2::balance::send_funds',
-              typeArguments: [token.address],
-              arguments: [
-                balanceInput,
-                tx.pure.address(recipient.address)
-              ]
-            });
-            
-            // Native protocol-level gasless exemption
-            tx.setGasPrice(0);
-            tx.setGasBudget(0);
-            tx.setGasPayment([]);
-          }
+          // Protocol-level gasless transfer using Native Address Balances
+          // We use ts-ignore just in case the installed SDK version doesn't have the types for tx.balance yet
+          // @ts-ignore
+          const balanceInput = typeof tx.balance === 'function' ? tx.balance({ balance: amountRaw }) : tx.pure.u64(amountRaw);
+          
+          tx.moveCall({
+            target: '0x2::balance::send_funds',
+            typeArguments: [token.address],
+            arguments: [
+              balanceInput,
+              tx.pure.address(recipient.address)
+            ]
+          });
+          
+          // Native protocol-level gasless exemption
+          tx.setGasPrice(0);
+          tx.setGasBudget(0);
+          tx.setGasPayment([]);
 
           push({ kind: 'info', text: `submitting public transaction...` });
           
