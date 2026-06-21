@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { BOOT_LINES } from './constants';
-import { SUI_STABLECOINS, KIBO_PACKAGE_ID, SHIELDED_POOL_ID, EXPLORER_TX } from '../suiChain';
+import { SUI_STABLECOINS, EXPLORER_TX } from '../suiChain';
 import type { OutputLine } from '../../components/TerminalOutput';
 import { parseCommand } from '../commandParser';
 import { getContacts, findContact } from '../contacts';
@@ -10,8 +10,7 @@ import type { Step } from './types';
 import { handleStepInput } from './stepFlow';
 import { handleCommand } from './commandFlow';
 import { Transaction } from '@mysten/sui/transactions';
-import { suiClient, executeSponsoredTransaction } from '../wallet';
-import { encryptMetadata } from '../crypto';
+import { suiClient } from '../wallet';
 
 type UseTerminalOptions = {
   wallet?: AgentWallet | null;
@@ -28,8 +27,6 @@ export function useTerminalController(options: UseTerminalOptions = {}) {
   const [contacts, setContacts] = useState<Awaited<ReturnType<typeof getContacts>>>([]);
   const [step, setStep] = useState<Step>(null);
   
-  // Private-by-default toggle (changed to false by user request)
-  const [isPrivateMode, setIsPrivateMode] = useState<boolean>(false);
   
   const syncingRef = useRef(false);
 
@@ -118,136 +115,50 @@ export function useTerminalController(options: UseTerminalOptions = {}) {
           return false;
         }
 
-        if (isPrivateMode) {
-          push({ kind: 'info', text: `encrypting payment payload for @${recipient.label}...` });
-          
-          // A. Fetch recipient's encryption public key from directory
-          let recipientPubkeyStr = '';
-          try {
-            const pubkeyResp = await baseApi.get(`/users/${recipient.address}/pubkey`);
-            recipientPubkeyStr = pubkeyResp.data?.publicKey || '';
-          } catch (e) {
-            // Try fetching by username/label if address fails
-            try {
-              const pubkeyResp = await baseApi.get(`/users/${recipient.label}/pubkey`);
-              recipientPubkeyStr = pubkeyResp.data?.publicKey || '';
-            } catch {
-              recipientPubkeyStr = '';
-            }
-          }
+        // Public Direct Gasless stablecoin transfer
+        push({ kind: 'info', text: `preparing public transfer of ${amount} ${token.symbol} → @${recipient.label}...` });
+        
+        const tx = new Transaction();
 
-          if (!recipientPubkeyStr) {
-            push({ 
-              kind: 'error', 
-              text: `recipient @${recipient.label} does not have a registered Kibo encryption key. Private transfers cannot be completed. Please toggle Private Mode OFF to send publicly.` 
-            });
-            return false;
-          }
+        // 1. Get user's coins
+        const coinsData = await suiClient.getCoins({ owner: wallet.address, coinType: token.address });
+        if (coinsData.data.length === 0) throw new Error(`No ${token.symbol} coins found in wallet.`);
+        
+        const primaryCoin = tx.object(coinsData.data[0].coinObjectId);
+        
+        // 2. Merge remaining coins if multiple exist
+        if (coinsData.data.length > 1) {
+          tx.mergeCoins(primaryCoin, coinsData.data.slice(1).map((c: any) => tx.object(c.coinObjectId)));
+        }
+        
+        // 3. Extract balance from coin (required for gasless stablecoin transfers)
+        const balance = tx.moveCall({
+          target: '0x2::coin::into_balance',
+          typeArguments: [token.address],
+          arguments: [primaryCoin],
+        });
+        
+        // 4. Split the balance
+        const splitBalance = tx.moveCall({
+          target: '0x2::balance::split',
+          typeArguments: [token.address],
+          arguments: [balance, tx.pure.u64(amountRaw)],
+        });
 
-          // B. Generate random 256-bit salt for commitment
-          const salt = Array.from(window.crypto.getRandomValues(new Uint8Array(32)))
-            .map(b => b.toString(16).padStart(2, '0')).join('');
-
-          // C. Calculate sha256 commitment hash
-          const encoder = new TextEncoder();
-          const commitmentStr = `${amountRaw}:${salt}`;
-          const hashBuffer = await window.crypto.subtle.digest('SHA-256', encoder.encode(commitmentStr));
-          const commitmentBytes = new Uint8Array(hashBuffer);
-          
-          // D. Encrypt metadata
-          const encryptedPayload = await encryptMetadata(recipientPubkeyStr, {
-            amount: amountRaw.toString(),
-            salt: salt,
-            sender: wallet.username,
-            tokenSymbol: token.symbol,
-            coinType: token.address,
-          });
-          const encryptedMetadataBytes = encoder.encode(JSON.stringify(encryptedPayload));
-
-          // E. Construct transaction block for ShieldedPool deposit
-          const tx = new Transaction();
-          
-          // Get user's coin objects of coinType
-          const coinsData = await suiClient.getCoins({ owner: wallet.address, coinType: token.address });
-          if (coinsData.data.length === 0) {
-            throw new Error(`No ${token.symbol} coin objects found in wallet.`);
-          }
-
-          let primaryCoinInput;
-          const firstCoin = coinsData.data[0].coinObjectId;
-          const primaryCoin = tx.object(firstCoin);
-          
-          // Merge remaining coin objects if multiple exist
-          if (coinsData.data.length > 1) {
-            tx.mergeCoins(primaryCoin, coinsData.data.slice(1).map((c: any) => tx.object(c.coinObjectId)));
-          }
-          const [splitCoin] = tx.splitCoins(primaryCoin, [tx.pure.u64(amountRaw)]);
-          primaryCoinInput = splitCoin;
-
-          // Call deposit
-          tx.moveCall({
-            target: `${KIBO_PACKAGE_ID}::shielded_pool::deposit`,
-            typeArguments: [token.address],
-            arguments: [
-              tx.object(SHIELDED_POOL_ID),
-              primaryCoinInput,
-              tx.pure.vector('u8', Array.from(commitmentBytes)),
-              tx.pure.vector('u8', Array.from(encryptedMetadataBytes)),
-            ],
-          });
-
-          push({ kind: 'info', text: `submitting shielded deposit transaction (gasless)...` });
-          
-          // Sign and execute via sponsor relayer
-          const digest = await executeSponsoredTransaction(wallet, tx);
-
-          // Record activity in local database
-          await baseApi.post('/activity', {
-            txHash: digest,
-            amount: amount,
-            to: recipient.address,
-            label: `@${recipient.label} (Private)`,
-          });
-
-          // Route encrypted payload off-chain via Supabase so recipient's frontend can auto-claim
-          await baseApi.post('/private_transfers', {
-            recipient_address: recipient.address,
-            encrypted_payload: JSON.stringify(encryptedPayload),
-          });
-
-          push(
-            { kind: 'success', text: `✓ Private transfer sent to @${recipient.label}!` },
-            { kind: 'output', text: `  (recipient's wallet will automatically claim funds in background)` },
-            { kind: 'link', text: `  explorer ↗`, href: EXPLORER_TX(digest) }
-          );
-        } else {
-          // Public Direct Gasless stablecoin transfer
-          push({ kind: 'info', text: `preparing public transfer of ${amount} ${token.symbol} → @${recipient.label}...` });
-          
-          const tx = new Transaction();
-
-          // 1. Get user's coins
-          const coinsData = await suiClient.getCoins({ owner: wallet.address, coinType: token.address });
-          if (coinsData.data.length === 0) throw new Error(`No ${token.symbol} coins found in wallet.`);
-          
-          const primaryCoin = tx.object(coinsData.data[0].coinObjectId);
-          
-          // 2. Merge remaining coins if multiple exist
-          if (coinsData.data.length > 1) {
-            tx.mergeCoins(primaryCoin, coinsData.data.slice(1).map((c: any) => tx.object(c.coinObjectId)));
-          }
-          
-          // 3. Split the transfer amount
-          const [splitCoin] = tx.splitCoins(primaryCoin, [tx.pure.u64(amountRaw)]);
-          
-          // 4. Send via MoveCall to public_transfer (TransferObjects is not allowed in gasless)
-          tx.moveCall({
-            target: '0x2::transfer::public_transfer',
-            typeArguments: [`0x2::coin::Coin<${token.address}>`],
-            arguments: [splitCoin, tx.pure.address(recipient.address)]
-          });
-          
-          // Native protocol-level gasless exemption
+        // 5. Send via send_funds (this is the supported gasless method)
+        tx.moveCall({
+          target: '0x2::balance::send_funds',
+          typeArguments: [token.address],
+          arguments: [splitBalance, tx.pure.address(recipient.address)]
+        });
+        
+        // 6. Return remaining balance to coin and send back to sender
+        const remainingCoin = tx.moveCall({
+          target: '0x2::coin::from_balance',
+          typeArguments: [token.address],
+          arguments: [balance]
+        });
+        tx.transferObjects([remainingCoin], tx.pure.address(wallet.address));
           tx.setGasPrice(0);
           tx.setGasBudget(0);
           tx.setGasPayment([]);
@@ -280,11 +191,9 @@ export function useTerminalController(options: UseTerminalOptions = {}) {
             { kind: 'success', text: `✓ Public transfer of ${amount} ${token.symbol} successful!` },
             { kind: 'link', text: `  explorer ↗`, href: EXPLORER_TX(digest) }
           );
-          
           if (options.onTransactionSuccess) {
             options.onTransactionSuccess();
           }
-        }
         return true;
       } catch (e: any) {
         push({ kind: 'error', text: `transfer failed: ${e.message}` });
@@ -293,7 +202,7 @@ export function useTerminalController(options: UseTerminalOptions = {}) {
         setBusy(false);
       }
     },
-    [wallet, push, isPrivateMode]
+    [wallet, push]
   );
 
   const handleSubmit = useCallback(
@@ -340,7 +249,6 @@ export function useTerminalController(options: UseTerminalOptions = {}) {
         setLines,
         bootLines: BOOT_LINES,
         push,
-        isPrivateMode,
       });
     },
     [wallet, executeSend, push, step]
@@ -376,8 +284,6 @@ export function useTerminalController(options: UseTerminalOptions = {}) {
     wallet,
     contacts,
     step,
-    isPrivateMode,
-    setIsPrivateMode,
     handleSubmit,
     setWallet,
     confirmSendTransaction,

@@ -9,8 +9,6 @@ type TerminalFooterProps = {
   helperText: string;
   quickActions: string[];
   submitLabel: string;
-  isPrivateMode?: boolean;
-  setIsPrivateMode?: (v: boolean) => void;
 };
 
 export default function TerminalFooter({
@@ -21,8 +19,6 @@ export default function TerminalFooter({
   helperText,
   quickActions,
   submitLabel,
-  isPrivateMode,
-  setIsPrivateMode,
 }: TerminalFooterProps) {
   const showHelper = helperText.trim().length > 0;
 
@@ -40,8 +36,6 @@ export default function TerminalFooter({
         isPassword={isPassword}
         quickActions={quickActions}
         submitLabel={submitLabel}
-        isPrivateMode={isPrivateMode}
-        setIsPrivateMode={setIsPrivateMode}
       />
     </div>
   );

@@ -1,9 +1,8 @@
 import { Ed25519Keypair } from '@mysten/sui/keypairs/ed25519';
 import { SuiClient } from '@mysten/sui/client';
 import { Transaction } from '@mysten/sui/transactions';
-import { SUI_TESTNET_RPC, SUI_STABLECOINS, KIBO_PACKAGE_ID, SHIELDED_POOL_ID } from './suiChain';
+import { SUI_TESTNET_RPC } from './suiChain';
 import { baseApi, setAuthToken, getAuthToken } from '../api';
-import { generateEncryptionKeypair } from './crypto';
 
 // Initialize the Sui Client
 export const suiClient = new SuiClient({ url: SUI_TESTNET_RPC });
@@ -16,9 +15,6 @@ export interface AgentWallet {
   readonly pfp?: string;
   readonly isZkLogin: boolean;
   readonly jwt?: string; // Google OAuth JWT
-  readonly salt?: string; // User-specific salt
-  readonly encryptionPrivateKey?: CryptoKey; // P-256 ECDH private key
-  readonly encryptionPublicKey?: string; // P-256 ECDH public key
 }
 
 // ─── Local Storage Keys ───────────────────────────────────────────────────
@@ -94,16 +90,12 @@ export async function loginWithGoogle(
   const keypair = await deriveKeypairFromSubAndSalt(sub, salt);
   const address = keypair.getPublicKey().toSuiAddress();
 
-  // 3. Generate or retrieve encryption keys
-  const encKey = await generateEncryptionKeypair(sub, salt);
-
   // 4. Authenticate on Kibo Backend
   const resp = await baseApi.post('/auth/zklogin', {
     jwt: credential,
     walletAddress: address,
     email,
     username: requestedUsername || '',
-    encryptionPublicKey: encKey.publicKeyStr,
   });
 
   const sessionToken = resp.data?.token;
@@ -130,9 +122,6 @@ export async function loginWithGoogle(
     pfp,
     isZkLogin: true,
     jwt: credential,
-    salt,
-    encryptionPrivateKey: encKey.privateKey,
-    encryptionPublicKey: encKey.publicKeyStr,
   };
 }
 
@@ -154,7 +143,6 @@ export async function tryRestoreSession(): Promise<AgentWallet | null> {
 
   try {
     const keypair = await deriveKeypairFromSubAndSalt(sub, salt);
-    const encKey = await generateEncryptionKeypair(sub, salt);
     
     // Validate session with backend
     const resp = await baseApi.get('/auth/me');
@@ -169,9 +157,6 @@ export async function tryRestoreSession(): Promise<AgentWallet | null> {
       pfp: freshPfp,
       isZkLogin: !!jwtToken,
       jwt: jwtToken || undefined,
-      salt,
-      encryptionPrivateKey: encKey.privateKey,
-      encryptionPublicKey: encKey.publicKeyStr,
     };
   } catch (err: any) {
     const status = err?.response?.status;
@@ -256,56 +241,3 @@ export async function executeSponsoredTransaction(
   return submitResult.digest;
 }
 
-// ─── Automated Zero-Knowledge Claiming ───────────────────────────────────
-
-/**
- * Automatically unshields a private payment using the decrypted salt payload
- */
-export async function claimPrivatePayment(
-  wallet: AgentWallet,
-  amount: number,
-  salt: string,
-  tokenSymbol: string = 'USDC'
-): Promise<string> {
-  const token = SUI_STABLECOINS.find(t => t.symbol.toLowerCase() === tokenSymbol.toLowerCase()) || SUI_STABLECOINS[0];
-  const amountRaw = BigInt(Math.floor(amount * Math.pow(10, token.decimals)));
-
-  // 1. Calculate commitment: sha256(amountRaw + salt)
-  const encoder = new TextEncoder();
-  const commitmentStr = `${amountRaw}:${salt}`;
-  const hashBuffer = await window.crypto.subtle.digest('SHA-256', encoder.encode(commitmentStr));
-  const commitmentBytes = new Uint8Array(hashBuffer);
-
-  // 2. Destination address bytes
-  const destAddrHex = wallet.address.replace('0x', '');
-  const destBytes = new Uint8Array(destAddrHex.match(/.{1,2}/g)!.map((byte: string) => parseInt(byte, 16)));
-
-  // 3. Message to sign = commitment bytes + destination address bytes
-  const msg = new Uint8Array(commitmentBytes.length + destBytes.length);
-  msg.set(commitmentBytes);
-  msg.set(destBytes, commitmentBytes.length);
-
-  // 4. Sign with user's keypair to generate ZKP
-  if (!wallet.keypair) {
-    throw new Error('Wallet private signing key is missing in this session.');
-  }
-  const userSig = await wallet.keypair.signTransaction(msg);
-  const pubKeyBytes = wallet.keypair.getPublicKey().toRawBytes();
-
-  // 5. Construct withdraw Transaction Block
-  const tx = new Transaction();
-  tx.moveCall({
-    target: `${KIBO_PACKAGE_ID}::shielded_pool::withdraw`,
-    typeArguments: [token.address],
-    arguments: [
-      tx.object(SHIELDED_POOL_ID),
-      tx.pure.vector('u8', Array.from(commitmentBytes)),
-      tx.pure.vector('u8', Array.from(pubKeyBytes)),
-      tx.pure.vector('u8', Array.from(atob(userSig.signature), c => c.charCodeAt(0))),
-      tx.pure.address(wallet.address),
-      tx.pure.u64(amountRaw),
-    ],
-  });
-
-  return executeSponsoredTransaction(wallet, tx);
-}

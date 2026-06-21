@@ -1,8 +1,8 @@
 import { baseApi } from '../api';
 
-export async function askGroq(message: string, isPrivateMode: boolean): Promise<string> {
+export async function askGroq(message: string): Promise<string> {
   try {
-    const response = await baseApi.post('/llm', { message, isPrivateMode });
+    const response = await baseApi.post('/llm', { message });
     return response.data.reply;
   } catch (error: any) {
     console.error("LLM Backend error:", error);

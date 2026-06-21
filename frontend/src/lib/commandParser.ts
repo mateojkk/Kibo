@@ -3,7 +3,6 @@
 export type Command =
   | { type: 'send'; amount: number; to: string; tokenSymbol?: string }
   | { type: 'claim'; amount: number; salt?: string }
-  | { type: 'balance'; tokenSymbol?: string }
   | { type: 'contacts' }
   | { type: 'add'; name: string; address: string }
   | { type: 'remove'; name: string }
@@ -76,18 +75,8 @@ export function parseCommand(input: string): Command {
     return { type: 'pin-set' };
   }
 
-  // balance [tokenSymbol]
-  if (lower.startsWith('balance ')) {
-    const symbol = parts.slice(1).join(' ').trim();
-    if (symbol) {
-      return { type: 'balance', tokenSymbol: symbol };
-    }
-  }
-
   // Single-word commands
   switch (lower) {
-    case 'balance':
-      return { type: 'balance' };
     case 'contacts':
     case 'book':
     case 'ls':

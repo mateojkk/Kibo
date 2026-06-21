@@ -1,6 +1,6 @@
 import type { OutputLine } from '../../components/TerminalOutput';
 import type { AgentWallet } from '../wallet';
-import { getPersistedUsername, suiClient, loginWithGoogle, generateMockGoogleJwt } from '../wallet';
+import { getPersistedUsername, loginWithGoogle, generateMockGoogleJwt } from '../wallet';
 import { getContacts, findContact } from '../contacts';
 
 import { SUI_STABLECOINS } from '../suiChain';
@@ -17,11 +17,10 @@ type CommandContext = {
   setLines: (lines: OutputLine[]) => void;
   bootLines: OutputLine[];
   push: (...lines: OutputLine[]) => void;
-  isPrivateMode: boolean;
 };
 
 export async function handleCommand(
-  { cmd, wallet, setWallet, setStep, setContacts, setBusy, setLines, bootLines, push, isPrivateMode }: CommandContext
+  { cmd, wallet, setWallet, setStep, setContacts, setBusy, setLines, bootLines, push }: CommandContext
 ): Promise<boolean> {
   if (cmd.type === 'clear') {
     setLines(bootLines);
@@ -92,46 +91,6 @@ export async function handleCommand(
 
 
 
-  if (cmd.type === 'balance') {
-    if (!wallet) { push({ kind: 'error', text: 'no wallet — type `login` or `create`' }); return true; }
-    setBusy(true);
-    push({ kind: 'info', text: 'fetching balances on Sui Testnet...' });
-    try {
-      if (cmd.tokenSymbol) {
-        const token = SUI_STABLECOINS.find(
-          (t) => t.symbol.toLowerCase() === cmd.tokenSymbol?.toLowerCase()
-        );
-        
-        if (!token) {
-          push({ kind: 'error', text: `token not supported: "${cmd.tokenSymbol}"` });
-          setBusy(false);
-          return true;
-        }
-        
-        const rawBal = await suiClient.getBalance({ owner: wallet.address, coinType: token.address });
-        const formatted = (Number(rawBal.totalBalance) / Math.pow(10, token.decimals)).toFixed(4);
-        push({ kind: 'success', text: `balance: ${formatted} ${token.symbol}` });
-      } else {
-        const balances = await Promise.all(
-          SUI_STABLECOINS.map(async (token) => {
-            try {
-              const rawBal = await suiClient.getBalance({ owner: wallet.address, coinType: token.address });
-              const formatted = (Number(rawBal.totalBalance) / Math.pow(10, token.decimals)).toFixed(4);
-              return `${token.symbol}: ${formatted}`;
-            } catch {
-              return `${token.symbol}: 0.0000`;
-            }
-          })
-        );
-        push({ kind: 'separator' });
-        balances.forEach((balLine) => push({ kind: 'output', text: `  ${balLine}` }));
-        push({ kind: 'separator' });
-      }
-    } catch (e: any) {
-      push({ kind: 'error', text: `failed: ${e.message}` });
-    } finally { setBusy(false); }
-    return true;
-  }
 
   if (cmd.type === 'send') {
     if (!wallet) { push({ kind: 'error', text: 'no wallet — type `login` or `create`' }); return true; }
@@ -167,7 +126,7 @@ export async function handleCommand(
       const contactName = contact ? contact.name : `${recipientAddress.slice(0, 6)}...${recipientAddress.slice(-4)}`;
       push({ 
         kind: 'output', 
-        text: `Are you sure you want to send ${cmd.amount} ${token.symbol} to @${contactName}? (${isPrivateMode ? 'Private' : 'Public'})\nType 'y' to confirm or 'n' to cancel.` 
+        text: `Are you sure you want to send ${cmd.amount} ${token.symbol} to @${contactName}? \nType 'y' to confirm or 'n' to cancel.` 
       });
       setStep({
         flow: 'confirm-send',
@@ -176,7 +135,6 @@ export async function handleCommand(
           to: cmd.to, 
           recipientAddress, 
           tokenSymbol: token.symbol,
-          isPrivate: isPrivateMode
         },
       });
     } catch (e: any) {
@@ -201,7 +159,7 @@ export async function handleCommand(
     setBusy(true);
     const { askGroq } = await import('../llm');
     const rawText = (cmd as any).raw || 'hello';
-    const reply = await askGroq(rawText, isPrivateMode);
+    const reply = await askGroq(rawText);
     setBusy(false);
     push({ kind: 'output', text: reply });
     return true;
@@ -210,7 +168,7 @@ export async function handleCommand(
   if (cmd.type === 'unknown') {
     setBusy(true);
     const { askGroq } = await import('../llm');
-    const reply = await askGroq(cmd.raw, isPrivateMode);
+    const reply = await askGroq(cmd.raw);
     setBusy(false);
     
     // Check if the LLM outputted a command
@@ -228,7 +186,7 @@ export async function handleCommand(
       const parsedCmd = parseCommand(extractedCmd);
       return await handleCommand({
         cmd: parsedCmd,
-        wallet, setWallet, setStep, setContacts, setBusy, setLines, bootLines, push, isPrivateMode
+        wallet, setWallet, setStep, setContacts, setBusy, setLines, bootLines, push
       });
     }
 

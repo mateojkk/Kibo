@@ -184,8 +184,6 @@ class ZkLoginSessionRequest(BaseModel):
     walletAddress: str
     email: str
     username: Optional[str] = None
-    encryptionPublicKey: Optional[str] = None
-
 
 class SponsorRequest(BaseModel):
     txBytes: str
@@ -273,8 +271,6 @@ def zklogin_session(req: ZkLoginSessionRequest, request: Request):
             updates["email"] = email
         if requested_username:
             updates["username"] = requested_username
-        if req.encryptionPublicKey:
-            updates["encryption_public_key"] = req.encryptionPublicKey
         try:
             supabase.table("users").update(updates).eq("id", user["id"]).execute()
         except APIError:
@@ -289,7 +285,6 @@ def zklogin_session(req: ZkLoginSessionRequest, request: Request):
             "password_hash": "",
             "keystore": "",
             "wallet_address": wallet_address,
-            "encryption_public_key": req.encryptionPublicKey or "",
             "created_at": now,
             "updated_at": now,
         }
@@ -661,18 +656,6 @@ def get_me(user: dict = Depends(get_current_user)):
     }
 
 
-@router.get("/users/{identifier}/pubkey")
-def get_user_pubkey(identifier: str):
-    supabase = get_supabase()
-    clean_id = identifier.strip().lower()
-    res = supabase.table("users").select("*").eq("username", clean_id).limit(1).execute()
-    user = res.data[0] if res.data else None
-    if not user:
-        res = supabase.table("users").select("*").eq("wallet_address", clean_id).limit(1).execute()
-        user = res.data[0] if res.data else None
-    if not user:
-        raise HTTPException(status_code=404, detail="user not found")
-    return {"publicKey": user.get("encryption_public_key", "")}
 
 
 class UpdateProfileRequest(BaseModel):
@@ -775,43 +758,9 @@ def delete_contact(contact_id: str, user: dict = Depends(get_current_user)):
         raise HTTPException(status_code=404, detail="contact not found")
     return None
 
-# ── private transfers ──────────────────────────────────────
-
-class PrivateTransferRequest(BaseModel):
-    recipient_address: str
-    encrypted_payload: str
-
-@router.post("/private_transfers", status_code=201)
-def create_private_transfer(req: PrivateTransferRequest, user: dict = Depends(get_current_user)):
-    supabase = get_supabase()
-    doc = {
-        "sender_address": user.get("wallet_address", ""),
-        "recipient_address": req.recipient_address,
-        "encrypted_payload": req.encrypted_payload,
-        "status": "pending",
-        "created_at": now_iso()
-    }
-    res = supabase.table("private_transfers").insert(doc).execute()
-    return res.data[0]
-
-@router.get("/private_transfers/pending")
-def list_pending_private_transfers(user: dict = Depends(get_current_user)):
-    supabase = get_supabase()
-    res = supabase.table("private_transfers").select("*").eq("recipient_address", user.get("wallet_address", "")).eq("status", "pending").execute()
-    return res.data
-
-@router.post("/private_transfers/{transfer_id}/claim", status_code=200)
-def claim_private_transfer(transfer_id: str, user: dict = Depends(get_current_user)):
-    supabase = get_supabase()
-    res = supabase.table("private_transfers").update({"status": "claimed"}).eq("id", transfer_id).eq("recipient_address", user.get("wallet_address", "")).execute()
-    if not res.data:
-        raise HTTPException(status_code=404, detail="transfer not found or already claimed")
-    return res.data[0]
-
 
 class LLMRequest(BaseModel):
     message: str
-    isPrivateMode: bool
 
 @router.post("/llm")
 def process_llm_request(req: LLMRequest):
@@ -824,13 +773,12 @@ def process_llm_request(req: LLMRequest):
         "Authorization": f"Bearer {groq_api_key}",
         "Content-Type": "application/json"
     }
-    mode_text = "Private (Shielded Pool)" if req.isPrivateMode else "Public (Standard)"
     payload = {
         "model": "llama-3.1-8b-instant",
         "messages": [
             {
                 "role": "system",
-                "content": f"You are Kibo, a fast, cool conversational crypto payments assistant on the Sui blockchain. You were created by Kibo Labs. Your mode is: {mode_text}.\nKeep answers brief, cool, entirely in lowercase. Max 2 sentences.\nCRITICAL: If the user wants to send/transfer money, you MUST append the exact command format `<CMD: send AMOUNT TOKEN to RECIPIENT>` at the very end of your message. Example: `sure thing bro. <CMD: send 1 USDC to @jk>`.\nIf the user asks to see their balance or portfolio, append `<CMD: balance>` at the end. Example: `here is your stash. <CMD: balance>`."
+                "content": f"You are Kibo, a fast, cool conversational crypto payments assistant on the Sui blockchain. You were created by Kibo Labs.\nKeep answers brief, cool, entirely in lowercase. Max 2 sentences.\nCRITICAL: If the user wants to send/transfer money, you MUST append the exact command format `<CMD: send AMOUNT TOKEN to RECIPIENT>` at the very end of your message. Example: `sure thing bro. <CMD: send 1 USDC to @jk>`.\nIf the user asks to see their balance or portfolio, append `<CMD: balance>` at the end. Example: `here is your stash. <CMD: balance>`."
             },
             {
                 "role": "user",

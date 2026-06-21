@@ -26,11 +26,4 @@ describe('parseCommand', () => {
     }
   });
 
-  it('parses balance command with token symbol', () => {
-    const cmd = parseCommand('balance pathUSD');
-    expect(cmd.type).toBe('balance');
-    if (cmd.type === 'balance') {
-      expect(cmd.tokenSymbol).toBe('pathUSD');
-    }
-  });
 });

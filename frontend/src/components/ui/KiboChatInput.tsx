@@ -1,4 +1,4 @@
-import { ArrowUp, History, Send, Shield, Wallet, Lock, Unlock } from 'lucide-react';
+import { ArrowUp, History, Send, Shield, Wallet } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState, type KeyboardEvent } from 'react';
 import styles from '../../styles/kiboChatInput.module.css';
 
@@ -9,11 +9,9 @@ type KiboChatInputProps = {
   history: string[];
   quickActions: string[];
   submitLabel?: string;
-  isPrivateMode?: boolean;
-  setIsPrivateMode?: (v: boolean) => void;
 };
 
-const COMMANDS = ['send', 'claim', 'balance', 'contacts', 'history', 'pin set', 'help', 'clear', 'whoami', 'login', 'create'];
+const COMMANDS = ['send', 'claim', 'contacts', 'history', 'pin set', 'help', 'clear', 'whoami', 'login', 'create'];
 
 const ACTION_ICONS: Record<string, typeof Wallet> = {
   balance: Wallet,
@@ -29,8 +27,6 @@ export default function KiboChatInput({
   history,
   quickActions,
   submitLabel = 'Send',
-  isPrivateMode = false,
-  setIsPrivateMode,
 }: KiboChatInputProps) {
   const [value, setValue] = useState('');
   const [histIdx, setHistIdx] = useState(-1);
@@ -135,7 +131,7 @@ export default function KiboChatInput({
         </div>
       )}
 
-      <div className={`${styles.composer} ${isPrivateMode && !isPassword ? styles.composerPrivate : ''}`}>
+      <div className={styles.composer}>
         <div className={styles.inputWrap}>
           {isPassword ? (
             <input
@@ -167,20 +163,6 @@ export default function KiboChatInput({
 
         <div className={styles.composerFooter}>
           <div className={styles.composerFooterLeft}>
-            {setIsPrivateMode && !isPassword && (
-              <button
-                type="button"
-                className={`${styles.toggleButton} ${isPrivateMode ? styles.privateActive : styles.privateInactive}`}
-                onClick={() => setIsPrivateMode(!isPrivateMode)}
-                title={isPrivateMode ? 'Private Mode Active (Transactions are Shielded)' : 'Private Mode Inactive (Transactions are Public)'}
-                style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '4px 10px', borderRadius: '12px', background: isPrivateMode ? 'var(--accent-alpha)' : 'transparent', border: isPrivateMode ? '1px solid var(--accent)' : '1px solid var(--border-hl)', color: isPrivateMode ? 'var(--accent)' : 'var(--fg-muted)' }}
-              >
-                {isPrivateMode ? <Lock size={14} /> : <Unlock size={14} />}
-                <span style={{ fontSize: '11px', fontWeight: 500, letterSpacing: '0.02em', textTransform: 'uppercase' }}>
-                  {isPrivateMode ? 'Shielded' : 'Public'}
-                </span>
-              </button>
-            )}
           </div>
           <button
             type="button"
@@ -212,11 +194,6 @@ export default function KiboChatInput({
         </div>
       )}
 
-      {!isPassword && (
-        <div className={styles.disclaimer}>
-          <Lock size={10} /> Deterministic input/output to ensure your funds are safe.
-        </div>
-      )}
     </div>
   );
 }

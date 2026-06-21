@@ -22,8 +22,6 @@ export default function Terminal({ wallet: externalWallet, onWalletChange, refre
     cmdHistory,
     busy,
     step,
-    isPrivateMode,
-    setIsPrivateMode,
     handleSubmit,
   } = useTerminalController({ wallet: externalWallet, onWalletChange, onTransactionSuccess: refreshBalance });
 
@@ -56,8 +54,6 @@ export default function Terminal({ wallet: externalWallet, onWalletChange, refre
         helperText={helperText}
         quickActions={quickActions}
         submitLabel={submitLabel}
-        isPrivateMode={isPrivateMode}
-        setIsPrivateMode={setIsPrivateMode}
       />
     </div>
   );
@@ -72,8 +68,8 @@ function getStepHelper(step: NonNullable<Step>) {
       return 'Enter invite code to claim your new wallet.';
     case 'connect-load':
       return 'Enter your email address to log in.';
-    case 'claim-private':
-      return `Claiming private payment of ${step.amount} USDC.`;
+    case 'confirm-send':
+      return 'Follow the prompt to continue.';
     default:
       return 'Follow the prompt to continue.';
   }

@@ -4,7 +4,6 @@ import AuthView from './views/AuthView';
 import AppShell from './components/AppShell';
 import type { AgentWallet } from './lib/wallet';
 import { destroyWallet } from './lib/wallet';
-import { useAutoClaim } from './hooks/useAutoClaim';
 
 export default function App() {
   const {
@@ -20,8 +19,6 @@ export default function App() {
     removeContact,
   } = useAppState();
 
-  // Run the background Zero-Knowledge Proof unshielding process
-  useAutoClaim(wallet, refreshBalance);
 
   const handleWallet = (w: AgentWallet) => {
     setWallet(w);
