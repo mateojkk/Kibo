@@ -210,7 +210,7 @@ export default function KiboChatInput({
 
       {!isPassword && (
         <div className={styles.disclaimer}>
-          <Lock size={10} /> Private · zero data retention — your chats are never training data.
+          <Lock size={10} /> Deterministic input/output to ensure your funds are safe.
         </div>
       )}
     </div>
