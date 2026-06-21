@@ -393,7 +393,7 @@ button.auth-divider:hover {
     max-width: 100%;
     min-height: 100dvh;
     padding: max(18px, env(safe-area-inset-top)) 20px max(18px, env(safe-area-inset-bottom));
-    background: linear-gradient(rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.5)), url('/login-image.jpg') center/cover no-repeat;
+    background: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.4)), url('/login-image.jpg') center/cover no-repeat;
   }
 
   .auth-left {
@@ -414,13 +414,15 @@ button.auth-divider:hover {
     height: 56px;
     border-radius: 14px;
     margin-bottom: 4px;
+    filter: invert(1) contrast(1.2);
   }
 
   .auth-tagline {
     font-size: 15px;
-    color: var(--fg);
+    color: #0B1215 !important;
     margin-bottom: 24px;
     text-align: center;
+    font-weight: 600;
   }
 
   .auth-card {
@@ -436,16 +438,17 @@ button.auth-divider:hover {
   }
 
   .auth-field label {
-    color: var(--fg);
+    color: #0B1215 !important;
     font-size: 14px;
-    font-weight: 500;
+    font-weight: 600;
     margin-bottom: 8px;
     text-align: center;
   }
 
   .auth-input {
-    border-bottom-color: var(--border) !important;
-    color: var(--fg) !important;
+    border-bottom-color: #0B1215 !important;
+    color: #0B1215 !important;
+    font-weight: 500;
   }
 
   .auth-input:focus {
@@ -455,13 +458,13 @@ button.auth-divider:hover {
   }
 
   .auth-input::placeholder {
-    color: var(--fg-muted);
+    color: rgba(11, 18, 21, 0.6) !important;
   }
 
   .auth-note {
-    color: var(--fg-dim);
+    color: rgba(11, 18, 21, 0.8) !important;
     font-size: 14px;
-    font-weight: 400;
+    font-weight: 500;
     text-align: center;
   }
 
@@ -470,9 +473,9 @@ button.auth-divider:hover {
   }
 
   .auth-link {
-    color: var(--fg);
+    color: #0B1215 !important;
     font-size: 14px;
-    font-weight: 500;
+    font-weight: 600;
   }
 
   .auth-note,
