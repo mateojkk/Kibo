@@ -144,4 +144,9 @@ cd frontend
 npm test
 npm run lint
 ```
-# Kibo
+## Post-Hackathon Goals
+
+Building the ultimate chat-first P2P payment experience requires a few more pieces of critical infrastructure that fall just outside the scope of this hackathon:
+
+- **Fiat On-Ramps:** Integrating secure, direct fiat-to-USDC rails (e.g., Stripe Crypto, Coinbase Pay) so users can fund their wallets without touching an external exchange.
+- **Payment Requests:** Implementing a robust `request <amount> from <contact>` command that generates shareable payment links and push notifications for seamless cross-border invoicing.

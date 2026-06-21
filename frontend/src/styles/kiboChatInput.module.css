@@ -126,6 +126,7 @@
   color: var(--fg);
   font-family: var(--font-ui);
   font-size: 14px;
+  font-weight: 400 !important;
   line-height: 1.4;
   resize: none;
 }
