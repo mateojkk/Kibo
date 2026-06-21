@@ -115,8 +115,8 @@
   flex-shrink: 0;
 }
 
-.contact-info { flex: 1; min-width: 0; }
-.contact-name { font-size: 14px; font-weight: 500; text-transform: capitalize; }
+.contact-info { flex: 1; min-width: 0; color: var(--fg); }
+.contact-name { font-size: 14px; font-weight: 500; text-transform: capitalize; color: var(--fg); }
 .contact-addr { font-size: 12px; color: var(--fg-muted); font-family: var(--font-mono); margin-top: 4px; }
 
 .contact-actions {
