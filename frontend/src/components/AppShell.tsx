@@ -73,12 +73,12 @@ export default function AppShell({
           {wallet.pfp ? (
             <>
               <img src={wallet.pfp} className={styles['user-pfp']} alt="" />
-              @{wallet.username}
+              <span className={styles['user-badge-text']}>@{wallet.username}</span>
             </>
           ) : (
             <>
-              <span className={styles['user-dot']} />
-              @{wallet.username} · {shortAddr}
+              <div className={styles['user-pfp-fallback']}>{wallet.username.charAt(0).toUpperCase()}</div>
+              <span className={styles['user-badge-text']}>@{wallet.username} · {shortAddr}</span>
             </>
           )}
         </div>
@@ -183,6 +183,7 @@ export default function AppShell({
           label="Settings"
           active={activeTab === 'settings'}
           onClick={() => setActiveTab('settings')}
+          className={styles['mobile-hidden-tab']}
           icon={
             <svg className={styles['tab-icon']} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/>
@@ -200,10 +201,10 @@ function isTab(value: string | null): value is Tab {
   return value === 'home' || value === 'contacts' || value === 'chat' || value === 'settings' || value === 'transactions';
 }
 
-function TabItem({ label, active, onClick, icon }: any) {
+function TabItem({ label, active, onClick, icon, className }: any) {
   return (
     <button
-      className={`${styles['tab-item']} ${active ? styles.active : ''}`}
+      className={`${styles['tab-item']} ${active ? styles.active : ''} ${className || ''}`}
       onClick={onClick}
     >
       {icon}

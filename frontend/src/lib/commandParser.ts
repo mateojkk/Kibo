@@ -16,6 +16,7 @@ export type Command =
   | { type: 'help' }
   | { type: 'clear' }
   | { type: 'whoami' }
+  | { type: 'greeting' }
   | { type: 'unknown'; raw: string };
 
 export function parseCommand(input: string): Command {
@@ -111,6 +112,13 @@ export function parseCommand(input: string): Command {
       return { type: 'clear' };
     case 'whoami':
       return { type: 'whoami' };
+    case 'hi':
+    case 'hey':
+    case 'hello':
+    case 'yo':
+    case 'sup':
+    case 'greetings':
+      return { type: 'greeting' };
     default:
       return { type: 'unknown', raw: trimmed };
   }

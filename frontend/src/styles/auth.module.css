@@ -92,6 +92,13 @@
   max-width: 28ch;
 }
 
+.mobile-text {
+  display: none;
+}
+.desktop-text {
+  display: inline;
+}
+
 .auth-card {
   width: 100%;
   max-width: 440px;
@@ -393,7 +400,7 @@ button.auth-divider:hover {
     max-width: 100%;
     min-height: 100dvh;
     padding: max(18px, env(safe-area-inset-top)) 20px max(18px, env(safe-area-inset-bottom));
-    background: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.4)), url('/login-image.jpg') center/cover no-repeat;
+    background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.8)), url('/login-image.jpg') center/cover no-repeat;
   }
 
   .auth-left {
@@ -409,20 +416,26 @@ button.auth-divider:hover {
     justify-content: center;
   }
 
+  .mobile-text {
+    display: inline;
+  }
+  .desktop-text {
+    display: none;
+  }
+
   .auth-logo-img {
     width: 56px;
     height: 56px;
     border-radius: 14px;
     margin-bottom: 4px;
-    filter: invert(1) contrast(1.2);
   }
 
   .auth-tagline {
     font-size: 15px;
-    color: #0B1215 !important;
+    color: var(--fg) !important;
     margin-bottom: 24px;
     text-align: center;
-    font-weight: 600;
+    font-weight: 500;
   }
 
   .auth-card {
@@ -438,16 +451,16 @@ button.auth-divider:hover {
   }
 
   .auth-field label {
-    color: #0B1215 !important;
+    color: var(--fg) !important;
     font-size: 14px;
-    font-weight: 600;
+    font-weight: 500;
     margin-bottom: 8px;
     text-align: center;
   }
 
   .auth-input {
-    border-bottom-color: #0B1215 !important;
-    color: #0B1215 !important;
+    border-bottom-color: var(--border) !important;
+    color: var(--fg) !important;
     font-weight: 500;
   }
 
@@ -458,13 +471,13 @@ button.auth-divider:hover {
   }
 
   .auth-input::placeholder {
-    color: rgba(11, 18, 21, 0.6) !important;
+    color: var(--fg-muted) !important;
   }
 
   .auth-note {
-    color: rgba(11, 18, 21, 0.8) !important;
+    color: var(--fg-dim) !important;
     font-size: 14px;
-    font-weight: 500;
+    font-weight: 400;
     text-align: center;
   }
 
@@ -473,9 +486,9 @@ button.auth-divider:hover {
   }
 
   .auth-link {
-    color: #0B1215 !important;
+    color: var(--fg) !important;
     font-size: 14px;
-    font-weight: 600;
+    font-weight: 500;
   }
 
   .auth-note,

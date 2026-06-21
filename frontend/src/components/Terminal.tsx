@@ -1,7 +1,6 @@
 import { useEffect, useRef } from 'react';
 import TerminalBody from './TerminalBody';
 import TerminalFooter from './TerminalFooter';
-import ConfirmTransferCard from './ConfirmTransferCard';
 
 import { useTerminalController } from '../lib/terminal/useTerminalController';
 import { stepMasksInput } from '../lib/terminal/stepFlow';
@@ -48,20 +47,15 @@ export default function Terminal({ wallet: externalWallet, onWalletChange }: Ter
           ?.focus();
       }}
     >
-      <TerminalBody lines={lines} busy={busy} bottomRef={bottomRef} />
-      {step?.flow === 'confirm-send' ? (
-        <div style={{ padding: '0 24px', width: '100%', marginBottom: '16px' }}>
-          <ConfirmTransferCard 
-            amount={step.pending.amount}
-            tokenSymbol={step.pending.tokenSymbol}
-            to={step.pending.to}
-            isPrivate={step.pending.isPrivate}
-            onConfirm={confirmSendTransaction}
-            onCancel={cancelSendTransaction}
-            busy={busy}
-          />
-        </div>
-      ) : (
+      <TerminalBody 
+        lines={lines} 
+        busy={busy} 
+        bottomRef={bottomRef} 
+        step={step}
+        onConfirmSend={confirmSendTransaction}
+        onCancelSend={cancelSendTransaction}
+      />
+      {step?.flow === 'confirm-send' ? null : (
         <TerminalFooter
           onSubmit={handleSubmit}
           disabled={busy}

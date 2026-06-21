@@ -2,6 +2,9 @@
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
 }
 
 .term-row {
@@ -30,9 +33,7 @@
 }
 
 .term-separator {
-  height: 1px;
-  margin: 0.35rem 1rem;
-  background: rgba(77,162,255, 0.14);
+  display: none;
 }
 
 .bubble-user {
@@ -99,10 +100,10 @@
 
 @media (max-width: 600px) {
   .term-row {
-    padding: 0 1rem;
+    padding: 0 20px;
   }
 
   .term-bubble {
-    max-width: 88%;
+    max-width: 82%;
   }
 }

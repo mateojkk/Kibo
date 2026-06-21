@@ -120,7 +120,12 @@ export default function AuthView({ onWallet }: AuthViewProps) {
             <img src="/logo.png" alt="kibo" style={{ width: '48px', height: '48px', borderRadius: '14px', objectFit: 'cover' }} />
             <p className={authStyles['auth-tagline']}>
               {step === 'signin'
-                ? 'Sign in to continue'
+                ? (
+                  <>
+                    <span className={authStyles['desktop-text']}>Sign in to continue</span>
+                    <span className={authStyles['mobile-text']}>Private conversational payments on Sui.</span>
+                  </>
+                )
                 : step === 'username'
                   ? 'Choose your username'
                   : 'Authenticating...'}

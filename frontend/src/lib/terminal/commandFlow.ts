@@ -192,8 +192,13 @@ export async function handleCommand(
     return true;
   }
 
+  if (cmd.type === 'greeting') {
+    push({ kind: 'output', text: 'hey, kibo agent at your service 👋' });
+    return true;
+  }
+
   if (cmd.type === 'unknown') {
-    push({ kind: 'error', text: `command not found: "${cmd.raw}" — type \`help\`` });
+    push({ kind: 'output', text: `I'm not quite sure what you mean by "${cmd.raw}". I'm a specialized payments agent, but you can type \`help\` to see what I can do!` });
     return true;
   }
 
