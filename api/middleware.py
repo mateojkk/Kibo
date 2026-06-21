@@ -7,12 +7,12 @@ from starlette.middleware.base import BaseHTTPMiddleware
 from config import TRUST_PROXY_HEADERS
 
 # ── Address validation ──────────────────────────────────────
-SUI_ADDRESS_RE = re.compile(r"^0x[0-9a-fA-F]{64}$")
+SUI_ADDRESS_RE = re.compile(r"^0x[0-9a-fA-F]{1,64}$")
 
 
 def is_valid_address(addr: str) -> bool:
     """Check if a string is a valid Sui hex address."""
-    return bool(SUI_ADDRESS_RE.match(addr))
+    return bool(SUI_ADDRESS_RE.match(addr.strip()))
 
 
 def get_client_ip(request: Request) -> str:

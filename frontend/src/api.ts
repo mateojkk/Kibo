@@ -3,12 +3,12 @@
  */
 import axios from 'axios';
 
-/** Sui address regex: 0x + 64 hex chars */
-const SUI_RE = /^0x[0-9a-fA-F]{64}$/;
+/** Sui address regex: 0x + up to 64 hex chars (leading zeros can be omitted) */
+const SUI_RE = /^0x[0-9a-fA-F]{1,64}$/;
 const AUTH_TOKEN_KEY = 'kibo_auth_token';
 
 export function isValidAddress(addr: string): boolean {
-  return SUI_RE.test(addr);
+  return SUI_RE.test(addr.trim());
 }
 
 /**

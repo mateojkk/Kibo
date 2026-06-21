@@ -154,7 +154,7 @@ export default function AppShell({
         />
         <TabItem
           id="contacts"
-          label="Contacts"
+          label="Address Book"
           active={activeTab === 'contacts'}
           onClick={() => setActiveTab('contacts')}
           icon={
